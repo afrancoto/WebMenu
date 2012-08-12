@@ -2,7 +2,7 @@ WebMenu
 
 DESCRIPTION Rhythmbox v2.9x plugin to search on the web for:
               * The Youtube video of the current playing song
-              * Album informations on Wikipedia
+              * The Wikipedia page of the album
 
 INSTALLATION * Copy this directory to ~/.local/share/rhythmbox/plugins 
              * Open Rhythmbox: Edit -> Plugins
