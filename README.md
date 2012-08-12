@@ -1,4 +1,5 @@
 RHYTHMBOX Web Menu
+==================
 
 DESCRIPTION: Rhythmbox v2.9x plugin to search on the web for the Youtube video of the current playing song and/or the Wikipedia page of the album.
 
