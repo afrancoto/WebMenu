@@ -42,7 +42,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     self.ui_id = ui_manager.add_ui_from_string(web_menu_item)
 
   def do_deactivate(self):
-    print 'Deactivating Search On YT Plugin'
     shell = self.object
     ui_manager = shell.props.ui_manager
     ui_manager.remove_ui(self.ui_id)
