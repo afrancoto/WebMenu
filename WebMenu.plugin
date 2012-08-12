@@ -3,6 +3,6 @@ Loader=python
 Module=WebMenu
 IAge=2
 Name=Web Menu
-Description=Look for the current playing song on Youtube, or the album on Wikipedia.
+Description=Look for the Youtube video of the current playing song and/or the Wikipedia page of the album.
 Authors=Andrea Franco <a.franco.to@gmail.com>
 Copyright=Copyright © 2012 Andrea Franco
