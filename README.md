@@ -3,9 +3,11 @@ RHYTHMBOX Web Menu
 
 DESCRIPTION: Rhythmbox v2.9x plugin to search on the web for the Youtube video of the current playing song and/or the Wikipedia page of the album.
 
-INSTALLATION: 1) Copy this directory to ~/.local/share/rhythmbox/plugins 
-	     2) Open Rhythmbox: Edit -> Plugins
-   	     3) Scroll to WebMenu and check Enabled
+DOWNLOAD: GET THE LAST VERSION HERE: https://github.com/afrancoto/WebMenu/downloads
+
+INSTALLATION: 1) Extract the archive in ~/.local/share/rhythmbox/plugins 
+	      2) Open Rhythmbox: Edit -> Plugins
+   	      3) Scroll to WebMenu and check Enabled
 
 USE: A new menu called "Web" will show up on Rhythmbox Menu Bar. You can also use those keyboard shortcuts: (Alt + Y) to search the song on Youtube, (Alt + W) to search the album on Wikipedia.
 
