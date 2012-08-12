@@ -1,3 +1,6 @@
+#WebMenu v.0.2
+#Andrea Franco 12/08/2012
+
 from gi.repository import GObject, RB, Peas, Gtk
 import os
 import urllib2
@@ -41,6 +44,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     ui_manager.insert_action_group(action_group)
     self.ui_id = ui_manager.add_ui_from_string(web_menu_item)
 
+    sp=shell.props.shell_player
+    sp.connect ('playing-song-changed', self.song_changed)
+    sp.connect ('playing-changed', self.song_changed)
+    sp.connect ('playing-source-changed', self.song_changed)
+
   def do_deactivate(self):
     shell = self.object
     ui_manager = shell.props.ui_manager
@@ -48,7 +56,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
   def search_on_youtube(self, event, shell):
     self.playing_entry = shell.props.shell_player.get_playing_entry()
-    playing_entry = self.playing_entry
     playing_artist = self.playing_entry.get_string(RB.RhythmDBPropType.ARTIST)
     playing_title = self.playing_entry.get_string(RB.RhythmDBPropType.TITLE)
     #playing_album = self.playing_entry.get_string(RB.RhythmDBPropType.ALBUM)
@@ -58,10 +65,20 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
   def search_on_wikipedia(self, event, shell):
     self.playing_entry = shell.props.shell_player.get_playing_entry()
-    playing_entry = self.playing_entry
     #playing_artist = self.playing_entry.get_string(RB.RhythmDBPropType.ARTIST)
     #playing_title = self.playing_entry.get_string(RB.RhythmDBPropType.TITLE)
     playing_album = self.playing_entry.get_string(RB.RhythmDBPropType.ALBUM)
 
     command="gnome-open http://en.wikipedia.org/w/index.php?search=\"" + urllib2.quote(playing_album) + "\""
     os.system(command)
+
+  def song_changed(self, event, shell):
+    shell = self.object
+    self.playing_entry = shell.props.shell_player.get_playing_entry()
+    
+    if self.playing_entry is None:
+	shell.props.ui_manager.get_widget("/MenuBar/WebMenu").hide()
+        return
+    else:
+	shell.props.ui_manager.get_widget("/MenuBar/WebMenu").show()
+	return
