@@ -1,4 +1,4 @@
-#WebMenu v.0.2
+#WebMenu v.0.3
 #Andrea Franco 12/08/2012
 
 from gi.repository import GObject, RB, Peas, Gtk
@@ -11,6 +11,7 @@ web_menu_item = '''
       <menu name="WebMenu" action="WebMenuAction">
         <menuitem name="SearchonYTitem" action="SearchOnYT"/>
 	<menuitem name="SearchonWPitem" action="SearchOnWP"/>
+	<menuitem name="SearchonALitem" action="SearchOnAL"/>
       </menu>
     </menubar>
   </ui>
@@ -39,6 +40,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     WPaction.connect ('activate', self.search_on_wikipedia, shell)
     action_group.add_action_with_accel (WPaction, "<alt>W")
     action_group.add_action(WPaction)
+    #Search on AllMusic
+    ALaction = Gtk.Action ('SearchOnAL', _('Search Artist on AllMusic'), _('Look for the current artist on AllMusic'), "")
+    ALaction.connect ('activate', self.search_on_allmusic, shell)
+    action_group.add_action_with_accel (ALaction, "<alt>L")
+    action_group.add_action(ALaction)
 
     ui_manager = shell.props.ui_manager
     ui_manager.insert_action_group(action_group)
@@ -70,6 +76,15 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     playing_album = self.playing_entry.get_string(RB.RhythmDBPropType.ALBUM)
 
     command="gnome-open http://en.wikipedia.org/w/index.php?search=\"" + urllib2.quote(playing_album) + "\""
+    os.system(command)
+
+  def search_on_allmusic(self, event, shell):
+    self.playing_entry = shell.props.shell_player.get_playing_entry()
+    playing_artist = self.playing_entry.get_string(RB.RhythmDBPropType.ARTIST)
+    #playing_title = self.playing_entry.get_string(RB.RhythmDBPropType.TITLE)
+    #playing_album = self.playing_entry.get_string(RB.RhythmDBPropType.ALBUM)
+
+    command="gnome-open http://www.allmusic.com/search/artists/\"" + urllib2.quote(playing_artist) + "\""
     os.system(command)
 
   def song_changed(self, event, shell):
