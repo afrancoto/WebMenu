@@ -1,7 +1,7 @@
 RHYTHMBOX Web Menu
 ==================
 
-DESCRIPTION: Rhythmbox v2.9x plugin to search on the web for the Youtube video of the current playing song, the Wikipedia page of the album and/or the AllMusic page of the artist.
+DESCRIPTION: Rhythmbox v2.9x plugin to find the current playing song on YouTube, or some informations about the album and/or the artist on Wikipedia, AllMusic, DiscoGS, Facebook and Myspace.
 
 DOWNLOAD: GET THE LAST VERSION HERE: https://github.com/afrancoto/WebMenu/downloads
 
@@ -9,7 +9,7 @@ INSTALLATION: 1) Extract the archive in ~/.local/share/rhythmbox/plugins
 	      2) Open Rhythmbox: Edit -> Plugins
    	      3) Scroll to WebMenu and check Enabled
 
-USE: A new menu called "Web" will show up on Rhythmbox Menu Bar. You can also use those keyboard shortcuts: (Alt + Y) to search the song on Youtube, (Alt + W) to search the album on Wikipedia.
+USE: A new menu called "Web" will show up on Rhythmbox Menu Bar. You can also use the keyboard shortcuts.
 
 BUGS AND SUGGESTIONS: Find a bug? Have a suggestion? Throw an issue via Git or write me an e-mail!
 
