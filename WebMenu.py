@@ -4,6 +4,7 @@
 from gi.repository import GObject, RB, Peas, Gtk
 import os
 import urllib2
+import Config
 
 web_menu_item = '''
   <ui>
@@ -18,7 +19,7 @@ web_menu_item = '''
 '''
 
 class WebMenuPlugin(GObject.Object, Peas.Activatable):
-  #__gtype_name__ = 'SearchOnYTPlugin'
+  __gtype_name__ = 'WebMenuPlugin'
   object = GObject.property(type=GObject.Object)
 
   def __init__(self):
