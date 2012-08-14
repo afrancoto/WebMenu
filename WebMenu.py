@@ -1,5 +1,5 @@
-#WebMenu v.0.4
-#Andrea Franco 12/08/2012
+#WebMenu v.0.5
+#Andrea Franco 14/08/2012
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -25,6 +25,7 @@ web_menu_item = '''
 		<menu name="AlbumMenu" action="album_menu_action">
 			<menuitem name="ALWPitem" action="album_wikipedia"/>
 			<menuitem name="ALALitem" action="album_allmusic"/>
+			<menuitem name="ALRYitem" action="album_rateyourmusic"/>
 			<menuitem name="ALGSitem" action="album_discogs"/>
 			<menuitem name="ALFBitem" action="album_facebook"/>
 			<separator/>
@@ -34,9 +35,11 @@ web_menu_item = '''
 		<menu name="ArtistMenu" action="artist_menu_action">
 			<menuitem name="ARWPitem" action="artist_wikipedia"/>
 			<menuitem name="ARALitem" action="artist_allmusic"/>
+			<menuitem name="ARRYitem" action="artist_rateyourmusic"/>
 			<menuitem name="ARGSitem" action="artist_discogs"/>
 			<menuitem name="ARFBitem" action="artist_facebook"/>
 			<menuitem name="ARMSitem" action="artist_myspace"/>
+			<menuitem name="ARTOitem" action="artist_torrentz"/>
 			<separator/>
 			<menuitem name="AR00item" action="artist_all"/>
 		</menu>
@@ -63,7 +66,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #  3.
 #    1
 #    ...
-#    5
+#    6
 ##########
 
   def draw_menu(self, shell): 
@@ -82,20 +85,25 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     #0.2.1 Album -> Wikipedia
     album_wikipedia_action = Gtk.Action ('album_wikipedia', _('Wikipedia'), _('Look for the current album on Wikipedia'), "")
     album_wikipedia_action.connect ('activate', self.search_on_wikipedia, shell, 1)  #The last argument "1" stands for "Album"
+    action_group.add_action_with_accel (album_wikipedia_action, "<alt>W")
     action_group.add_action(album_wikipedia_action)
     #0.2.2 Album -> AllMusic
     album_allmusic_action = Gtk.Action ('album_allmusic', _('AllMusic'), _('Look for the current album on AllMusic'), "")
     album_allmusic_action.connect ('activate', self.search_on_allmusic, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_allmusic_action)
-    #0.2.3 Album -> DiscoGS
+    #0.2.3 Album -> RateYourMusic
+    album_rateyourmusic_action = Gtk.Action ('album_rateyourmusic', _('RateYourMusic'), _('Look for the current album on RateYourMusic'), "")
+    album_rateyourmusic_action.connect ('activate', self.search_on_rateyourmusic, shell, 1) #The last argument "1" stands for "Album"
+    action_group.add_action(album_rateyourmusic_action)
+    #0.2.4 Album -> DiscoGS
     album_discogs_action = Gtk.Action ('album_discogs', _('DiscoGS'), _('Look for the current album on DiscoGS'), "")
     album_discogs_action.connect ('activate', self.search_on_discogs, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_discogs_action)
-    #0.2.3 Album -> Facebook
+    #0.2.5 Album -> Facebook
     album_facebook_action = Gtk.Action ('album_facebook', _('Facebook'), _('Look for the current album on Facebook'), "")
     album_facebook_action.connect ('activate', self.search_on_facebook, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_facebook_action)
-    #0.2.4 Album -> Every Service
+    #0.2.6 Album -> Every Service
     album_all_action = Gtk.Action ('album_all', _('All'), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_all_action)
@@ -109,20 +117,30 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     #0.3.2 Artist -> AllMusic
     artist_allmusic_action = Gtk.Action ('artist_allmusic', _('AllMusic'), _('Look for the current artist on AllMusic'), "")
     artist_allmusic_action.connect ('activate', self.search_on_allmusic, shell, 2) #The last argument "2" stands for "Artist"
+    action_group.add_action_with_accel (artist_allmusic_action, "<alt>A")
     action_group.add_action(artist_allmusic_action)
-    #0.3.3 Artist -> DiscoGS
+    #0.3.3 Artist -> RateYourMusic
+    artsit_rateyourmusic_action = Gtk.Action ('artist_rateyourmusic', _('RateYourMusic'), _('Look for the current artsit on RateYourMusic'), "")
+    artsit_rateyourmusic_action.connect ('activate', self.search_on_rateyourmusic, shell, 2) #The last argument "2" stands for "Artist"
+    action_group.add_action(artsit_rateyourmusic_action)
+    #0.3.4 Artist -> DiscoGS
     artist_discogs_action = Gtk.Action ('artist_discogs', _('DiscoGS'), _('Look for the current artist on DiscoGS'), "")
     artist_discogs_action.connect ('activate', self.search_on_discogs, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_discogs_action)
-    #0.3.4 Artist -> Facebook
+    #0.3.5 Artist -> Facebook
     artist_facebook_action = Gtk.Action ('artist_facebook', _('Facebook'), _('Look for the current artist on Facebook'), "")
     artist_facebook_action.connect ('activate', self.search_on_facebook, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_facebook_action)
-    #0.3.4 Artist -> Myspace
+    #0.3.6 Artist -> Myspace
     artist_myspace_action = Gtk.Action ('artist_myspace', _('Myspace'), _('Look for the current artist on Myspace'), "")
     artist_myspace_action.connect ('activate', self.search_on_myspace, shell) #No need to specify what to search
     action_group.add_action(artist_myspace_action)
-    #0.3.5 Artist -> Every Service
+    #0.3.7 Artist -> Torrentz
+    artist_torrentz_action = Gtk.Action ('artist_torrentz', _('Torrentz'), _('Look for the current artist on Torrentz'), "")
+    artist_torrentz_action.connect ('activate', self.search_on_torrentz, shell) #No need to specify what to search
+    action_group.add_action_with_accel (artist_torrentz_action, "<alt>T")
+    action_group.add_action(artist_torrentz_action)
+    #0.3.8 Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all', _('All'), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_all_action)
@@ -189,6 +207,15 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     os.system(command)
 
 ##########
+#The "search_on_rateyourmusic" function search the artist OR the album on rateyourmuisc; "what" argument: 0=title (not used), 1=album, 2=artist
+##########
+  def search_on_rateyourmusic(self, event, shell, what):
+    metadata=self.get_metadata(shell) #Calls "get_metadata"
+    what_text=['', 'l', 'a'] #rateyourmusic uses differt search engines for Songs, Albums and Artists
+    command="gnome-open \"http://rateyourmusic.com/search?searchterm=" + urllib2.quote(metadata[what]) + "&searchtype=" + what_text[what] + "\""
+    os.system(command)
+
+##########
 #The "search_on_discogs" function search the artist OR the album on facebook; "what" argument: 0=title (not used), 1=album, 2=artist
 ##########
   def search_on_discogs(self, event, shell, what):
@@ -215,14 +242,25 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     os.system(command)
 
 ##########
+#The "search_on_torrentz" function search ARTIST on torrentz
+##########
+  def search_on_torrentz(self, event, shell):
+    metadata=self.get_metadata(shell) #Calls "get_metadata"
+    command="gnome-open http://torrentz.com/search?f=\"" + urllib2.quote(metadata[2]) + "\""
+    os.system(command)
+
+##########
 #The "search_on_all" function search the artist OR the album on every service; "what" argument: 0=title (not used), 1=album, 2=artist
 ##########
   def search_on_all(self, event, shell, what):
     self.search_on_wikipedia('activate', shell, what)
     self.search_on_allmusic('activate', shell, what)
+    self.search_on_rateyourmusic('activate', shell, what)
     self.search_on_discogs('activate', shell, what)
     self.search_on_facebook('activate', shell, what)
-    if what==2: self.search_on_myspace('activate', shell)
+    if what==2: 
+	self.search_on_myspace('activate', shell)
+	self.search_on_torrentz('activate', shell)
 
 ##########
 #The "song_changed" function controls if no song is playing. If it is so, the 'Web' menu is hidden.

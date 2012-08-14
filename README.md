@@ -1,11 +1,15 @@
-RHYTHMBOX Web Menu
-==================
+RHYTHMBOX Web Menu 0.5
+======================
 
-DESCRIPTION: Rhythmbox v2.9x plugin to find the current playing song on YouTube, or some informations about the album and/or the artist on Wikipedia, AllMusic, DiscoGS, Facebook and Myspace.
+DESCRIPTION: Rhythmbox v2.9x plugin.
+	     * Search current playing song on Youtube.
+	     * Search its album on Wikipedia, AllMusic, RateYourMusic, DiscoGS, Facebook.
+	     * Search its artist on Wikipedia, AllMusic, RateYourMusic, DiscoGS, Facebook, Myspace, Torrentz.
 
 ![Screenshot](http://img29.imageshack.us/img29/1040/webmenu04.png)
 
-DOWNLOAD: GET THE LAST VERSION HERE: https://github.com/afrancoto/WebMenu/downloads
+DOWNLOAD: https://github.com/afrancoto/WebMenu/downloads
+--------
 
 INSTALLATION: 1) Extract the archive in ~/.local/share/rhythmbox/plugins 
 	      2) Open Rhythmbox: Edit -> Plugins
