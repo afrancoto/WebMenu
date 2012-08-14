@@ -3,6 +3,6 @@ Loader=python
 Module=WebMenu
 IAge=2
 Name=Web Menu
-Description=* Search current playing song on Youtube, its album on [Wikipedia, AllMusic, RateYourMusic, DiscoGS, Facebook] or its artist on [Wikipedia, AllMusic, RateYourMusic, DiscoGS, Facebook, Myspace, Torrentz]. (Version 0.5)
+Description=Search current playing song on Youtube, its album on [Wikipedia, AllMusic, RateYourMusic, DiscoGS, Facebook] or its artist on [Wikipedia, AllMusic, RateYourMusic, DiscoGS, Facebook, Myspace, Torrentz]. (Version 0.5)
 Authors=Andrea Franco <a.franco.to@gmail.com>
 Copyright=Copyright © 2012 Andrea Franco
