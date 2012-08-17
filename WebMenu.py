@@ -1,5 +1,5 @@
-#WebMenu v.0.5
-#Andrea Franco 14/08/2012
+#WebMenu v.0.7
+#Andrea Franco 18/08/2012
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -17,29 +17,33 @@ from gi.repository import GObject, RB, Peas, Gtk
 import os
 import urllib2
 
+from config import WMConfig
+from config import WMConfigDialog
+
 web_menu_item = '''
   <ui>
     <menubar name="MenuBar">
       	<menu name="WebMenu" action="WebMenuAction">
         	<menuitem name="YTitem" action="search_on_youtube_action"/>
 		<menu name="AlbumMenu" action="album_menu_action">
-			<menuitem name="ALWPitem" action="album_wikipedia"/>
-			<menuitem name="ALALitem" action="album_allmusic"/>
-			<menuitem name="ALRYitem" action="album_rateyourmusic"/>
-			<menuitem name="ALGSitem" action="album_discogs"/>
-			<menuitem name="ALFBitem" action="album_facebook"/>
+			<menuitem name="AL_wikipedia" action="album_wikipedia"/>
+			<menuitem name="AL_allmusic" action="album_allmusic"/>
+			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic"/>
+			<menuitem name="AL_discogs" action="album_discogs"/>
+			<menuitem name="AL_facebook" action="album_facebook"/>
 			<separator/>
 			<menuitem name="AL00item" action="album_all"/>
 			<separator/>
 		</menu>
 		<menu name="ArtistMenu" action="artist_menu_action">
-			<menuitem name="ARWPitem" action="artist_wikipedia"/>
-			<menuitem name="ARALitem" action="artist_allmusic"/>
-			<menuitem name="ARRYitem" action="artist_rateyourmusic"/>
-			<menuitem name="ARGSitem" action="artist_discogs"/>
-			<menuitem name="ARFBitem" action="artist_facebook"/>
-			<menuitem name="ARMSitem" action="artist_myspace"/>
-			<menuitem name="ARTOitem" action="artist_torrentz"/>
+			<menuitem name="AR_wikipedia" action="artist_wikipedia"/>
+			<menuitem name="AR_allmusic" action="artist_allmusic"/>
+			<menuitem name="AR_rateyourmusic" action="artist_rateyourmusic"/>
+			<menuitem name="AR_discogs" action="artist_discogs"/>
+			<menuitem name="AR_official" action="artist_official"/>
+			<menuitem name="AR_facebook" action="artist_facebook"/>
+			<menuitem name="AR_myspace" action="artist_myspace"/>
+			<menuitem name="AR_torrentz" action="artist_torrentz"/>
 			<separator/>
 			<menuitem name="AR00item" action="artist_all"/>
 		</menu>
@@ -127,20 +131,24 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     artist_discogs_action = Gtk.Action ('artist_discogs', _('DiscoGS'), _('Look for the current artist on DiscoGS'), "")
     artist_discogs_action.connect ('activate', self.search_on_discogs, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_discogs_action)
-    #0.3.5 Artist -> Facebook
+    #0.3.5 Artist -> Official Website
+    artist_official_action = Gtk.Action ('artist_official', _('Official Website'), _('Look for the current artist\'s official website'), "")
+    artist_official_action.connect ('activate', self.search_on_official, shell) #No need to specify what to search
+    action_group.add_action(artist_official_action)
+    #0.3.6 Artist -> Facebook
     artist_facebook_action = Gtk.Action ('artist_facebook', _('Facebook'), _('Look for the current artist on Facebook'), "")
     artist_facebook_action.connect ('activate', self.search_on_facebook, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_facebook_action)
-    #0.3.6 Artist -> Myspace
+    #0.3.7 Artist -> Myspace
     artist_myspace_action = Gtk.Action ('artist_myspace', _('Myspace'), _('Look for the current artist on Myspace'), "")
     artist_myspace_action.connect ('activate', self.search_on_myspace, shell) #No need to specify what to search
     action_group.add_action(artist_myspace_action)
-    #0.3.7 Artist -> Torrentz
+    #0.3.8 Artist -> Torrentz
     artist_torrentz_action = Gtk.Action ('artist_torrentz', _('Torrentz'), _('Look for the current artist on Torrentz'), "")
     artist_torrentz_action.connect ('activate', self.search_on_torrentz, shell) #No need to specify what to search
     action_group.add_action_with_accel (artist_torrentz_action, "<alt>T")
     action_group.add_action(artist_torrentz_action)
-    #0.3.8 Artist -> Every Service
+    #0.3.9 Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all', _('All'), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_all_action)
@@ -149,16 +157,45 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     self.ui_id = ui_manager.add_ui_from_string(web_menu_item)
 
 ##########
+#The "apply_settings" function is called when Rhythmbox is loaded and whenever the settings are changed
+##########
+  def apply_settings(self, settings, key, shell, config):  
+    self.settings = config.get_settings()
+    for website in self.settings["default-album-services"]: #Hides the non-active options in the "Album" submenu
+	menu_option="/MenuBar/WebMenu/AlbumMenu/AL_"+website
+	if (website not in self.settings["active-album-services"]):
+		shell.props.ui_manager.get_widget(menu_option).hide()
+	else:
+		shell.props.ui_manager.get_widget(menu_option).show()
+
+    for website in self.settings["default-artist-services"]: #Hides the non-active options in the "Artist" submenu
+	menu_option="/MenuBar/WebMenu/ArtistMenu/AR_"+website
+	if (website not in self.settings["active-artist-services"]):
+		shell.props.ui_manager.get_widget(menu_option).hide()
+	else:
+		shell.props.ui_manager.get_widget(menu_option).show()
+
+##########
 #The "do_activate" function is called when Rhythmbox is loaded
 ##########
   def do_activate(self):
     shell = self.object
+
     self.draw_menu(shell) #Calls "draw_menu"
+  
+    config = WMConfig()
+
+    self.apply_settings('oldsettings', None , shell, config) #Calls "apply_settings"
+
+    self.settings = config.get_settings() #Connects a change in the settings menus to "apply_settings"
+    self.settings.connect('changed', self.apply_settings, shell, config)
 
     sp=shell.props.shell_player #Connects variuos events to "song_changed"
     sp.connect ('playing-song-changed', self.song_changed)
     sp.connect ('playing-changed', self.song_changed)
     sp.connect ('playing-source-changed', self.song_changed)
+
+    self.song_changed #Calls "song_changed"
 
 ##########
 #The "do_deactivate" function removes the 'Web' Menu
@@ -223,6 +260,14 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     what_text=['track', 'release_title', 'artist'] #Allmusic uses differt search engines for Songs, Albums and Artists
     command="gnome-open \"http://www.discogs.com/advanced_search?" + what_text[what] + "=" + urllib2.quote(metadata[what]) + "\""
     if what==1: command=command + "\"&artist=" + urllib2.quote(metadata[2]) + "\"" #If you're looking for the album, the artist is added to get better results
+    os.system(command)
+
+##########
+#The "search_on_official" function opens the first result on Google for the query "ARTIST official website"
+##########
+  def search_on_official(self, event, shell):
+    metadata=self.get_metadata(shell) #Calls "get_metadata"
+    command="gnome-open \"http://www.google.com/search?q=" + urllib2.quote(metadata[2]+" official website") + "\"" #add btnI=I%27m+Feeling+Lucky& before the 'q=' to open the first result
     os.system(command)
 
 ##########
