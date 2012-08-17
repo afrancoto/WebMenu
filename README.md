@@ -10,12 +10,11 @@ With one click you can:
 
 You can personalize your Web Menu by choosing which websites are shown in each sub-menu.
 
-![Screenshot](http://s8.postimage.org/pnkzeoh5h/Schermata_del_2012_08_14_13_45_19.png)
-
-
 DOWNLOAD: 
 --------
 https://github.com/afrancoto/WebMenu/downloads
+
+![Screenshot](http://s8.postimage.org/pnkzeoh5h/Schermata_del_2012_08_14_13_45_19.png)
 
 INSTALLATION: 
 ------------
