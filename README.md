@@ -38,5 +38,7 @@ BUGS AND SUGGESTIONS:
 --------------------
 Find a bug? Have a suggestion? Throw an issue via Git or write me an e-mail!
 
+If you like it, share it! :D
+-------------------------
 
 Andrea Franco <a.franco.to@gmail.com>
