@@ -11,7 +11,7 @@ With one click you can:
 You can personalize your Web Menu by choosing which websites are shown in each sub-menu.
 
 ![Screenshot](http://s8.postimage.org/pnkzeoh5h/Schermata_del_2012_08_14_13_45_19.png)
-![Screenshot](http://s7.postimage.org/dhvywual7/Schermata_del_2012_08_18_01_36_21.png)
+
 
 DOWNLOAD: 
 --------
@@ -26,6 +26,8 @@ INSTALLATION:
 
 CONFIGURATION:
 --------------
+![Screenshot](http://s7.postimage.org/dhvywual7/Schermata_del_2012_08_18_01_36_21.png)
+
 You can choose which websites are shown by editing the plugin preferences:
 - Open Rhythmbox: Edit -> Plugins
 - Scroll to WebMenu and click Preferences
