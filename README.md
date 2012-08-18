@@ -20,7 +20,7 @@ Web Menu in the menu bar:
 ![Screenshot](http://s8.postimage.org/pnkzeoh5h/Schermata_del_2012_08_14_13_45_19.png)
 
 Web Menu in the context menu:
-![Screenshot](http://s9.postimage.org/h5iiuhtbz/Schermata_del_2012_08_18_20_54_35.png)
+![Screenshot](http://s9.postimage.org/f4ennt9z3/Schermata_del_2012_08_18_20_54_35.png)
 
 INSTALLATION: 
 ------------
