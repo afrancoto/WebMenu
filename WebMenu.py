@@ -1,4 +1,4 @@
-#WebMenu v.0.7
+#WebMenu v.0.8
 #Andrea Franco 18/08/2012
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ web_menu_item = '''
 			<menuitem name="AL_discogs" action="album_discogs"/>
 			<menuitem name="AL_facebook" action="album_facebook"/>
 			<separator/>
-			<menuitem name="AL00item" action="album_all"/>
+			<menuitem name="AL_all" action="album_all"/>
 			<separator/>
 		</menu>
 		<menu name="ArtistMenu" action="artist_menu_action">
@@ -45,7 +45,7 @@ web_menu_item = '''
 			<menuitem name="AR_myspace" action="artist_myspace"/>
 			<menuitem name="AR_torrentz" action="artist_torrentz"/>
 			<separator/>
-			<menuitem name="AR00item" action="artist_all"/>
+			<menuitem name="AR_all" action="artist_all"/>
 		</menu>
       	</menu>
     </menubar>
@@ -73,7 +73,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #    6
 ##########
 
-  def draw_menu(self, shell): 
+  def draw_menu(self, shell, settings): 
     #0. Web Menu
     action_group = Gtk.ActionGroup(name='WebMenuActionGroup')
     web_menu_action = Gtk.Action("WebMenuAction", _("Web"), None, None)
@@ -109,7 +109,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action(album_facebook_action)
     #0.2.6 Album -> Every Service
     album_all_action = Gtk.Action ('album_all', _('All'), _('Look for the current album on every service'), "")
-    album_all_action.connect ('activate', self.search_on_all, shell, 1) #The last argument "1" stands for "Album"
+    album_all_action.connect ('activate', self.search_on_all, shell, settings, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_all_action)
     #0.3 Artist Menu
     artist_menu_action = Gtk.Action("artist_menu_action", _("Artist"), None, None)
@@ -150,11 +150,12 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action(artist_torrentz_action)
     #0.3.9 Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all', _('All'), _('Look for the current artist on every service'), "")
-    artist_all_action.connect ('activate', self.search_on_all, shell, 2) #The last argument "2" stands for "Artist"
+    artist_all_action.connect ('activate', self.search_on_all, shell, settings, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_all_action)
     ui_manager = shell.props.ui_manager
     ui_manager.insert_action_group(action_group)
     self.ui_id = ui_manager.add_ui_from_string(web_menu_item)
+    ui_manager.ensure_update()
 
 ##########
 #The "apply_settings" function is called when Rhythmbox is loaded and whenever the settings are changed
@@ -180,22 +181,15 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
   def do_activate(self):
     shell = self.object
-
-    self.draw_menu(shell) #Calls "draw_menu"
-  
     config = WMConfig()
+    self.settings = config.get_settings()
 
+    self.draw_menu(shell, self.settings) #Calls "draw_menu"
     self.apply_settings('oldsettings', None , shell, config) #Calls "apply_settings"
+    self.settings.connect('changed', self.apply_settings, shell, config) #Connects a change in the settings menus to "apply_settings"
 
-    self.settings = config.get_settings() #Connects a change in the settings menus to "apply_settings"
-    self.settings.connect('changed', self.apply_settings, shell, config)
-
-    sp=shell.props.shell_player #Connects variuos events to "song_changed"
-    sp.connect ('playing-song-changed', self.song_changed)
-    sp.connect ('playing-changed', self.song_changed)
-    sp.connect ('playing-source-changed', self.song_changed)
-
-    self.song_changed #Calls "song_changed"
+    sp=shell.props.shell_player #Connects play/stop events to "song_changed")
+    sp.connect ('playing-changed', self.song_changed, shell.props, config.get_settings())
 
 ##########
 #The "do_deactivate" function removes the 'Web' Menu
@@ -297,24 +291,30 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
 #The "search_on_all" function search the artist OR the album on every service; "what" argument: 0=title (not used), 1=album, 2=artist
 ##########
-  def search_on_all(self, event, shell, what):
-    self.search_on_wikipedia('activate', shell, what)
-    self.search_on_allmusic('activate', shell, what)
-    self.search_on_rateyourmusic('activate', shell, what)
-    self.search_on_discogs('activate', shell, what)
-    self.search_on_facebook('activate', shell, what)
-    if what==2: 
-	self.search_on_myspace('activate', shell)
-	self.search_on_torrentz('activate', shell)
+  def search_on_all(self, event, shell, settings, what):
+    what_in_letters=['active-album-services', 'active-artist-services']
+
+    if 'wikipedia' in settings[what_in_letters[what-1]]: self.search_on_wikipedia('activate', shell, what)
+    if 'allmusic' in settings[what_in_letters[what-1]]: self.search_on_allmusic('activate', shell, what)
+    if 'rateyourmusic' in settings[what_in_letters[what-1]]: self.search_on_rateyourmusic('activate', shell, what)
+    if 'discogs' in settings[what_in_letters[what-1]]: self.search_on_discogs('activate', shell, what)
+    if 'official' in settings[what_in_letters[what-1]]: self.search_on_official('activate', shell)
+    if 'facebook' in settings[what_in_letters[what-1]]: self.search_on_facebook('activate', shell, what)
+    if 'myspace' in settings[what_in_letters[what-1]]: self.search_on_myspace('activate', shell)
+    if 'torrentz' in settings[what_in_letters[what-1]]:  self.search_on_torrentz('activate', shell)
 
 ##########
-#The "song_changed" function controls if no song is playing. If it is so, the 'Web' menu is hidden.
+#The "song_changed" function controls if no song is playing. If it is so, the 'Web' menu options are disabled.
 ##########
-  def song_changed(self, event, shell):
-    shell = self.object
-    self.playing_entry = shell.props.shell_player.get_playing_entry()
-    
-    if self.playing_entry is None:
-	shell.props.ui_manager.get_widget("/MenuBar/WebMenu").hide()
-    else:
-	shell.props.ui_manager.get_widget("/MenuBar/WebMenu").show()
+  def song_changed(self, playing, user_data, s_props, settings):
+    self.playing_entry = s_props.shell_player.get_playing_entry() 
+    now_is_playing=self.playing_entry is not None #current playing song==None --> False
+
+    s_props.ui_manager.get_widget("/MenuBar/WebMenu/YTitem").set_sensitive(now_is_playing)  #Disable the YouTube Option
+    for website in settings["default-album-services"]: #Disable all the options in the "Album" submenu
+	menu_option="/MenuBar/WebMenu/AlbumMenu/AL_"+website
+        s_props.ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
+    for website in settings["default-artist-services"]: #Enable all the options in the "Album" submenu
+	menu_option="/MenuBar/WebMenu/ArtistMenu/AR_"+website
+        s_props.ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
+

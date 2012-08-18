@@ -1,4 +1,4 @@
-RHYTHMBOX Web Menu 0.7
+RHYTHMBOX Web Menu 0.8
 ======================
 
 Rhythmbox v2.9x plugin.
@@ -25,7 +25,7 @@ INSTALLATION:
 
 CONFIGURATION:
 --------------
-![Screenshot](http://s7.postimage.org/dhvywual7/Schermata_del_2012_08_18_01_36_21.png)
+![Screenshot](http://s16.postimage.org/hwu6ddajp/Schermata_del_2012_08_18_18_03_11.png)
 
 You can choose which websites are shown by editing the plugin preferences:
 - Open Rhythmbox: Edit -> Plugins
@@ -34,6 +34,15 @@ You can choose which websites are shown by editing the plugin preferences:
 USE: 
 ----
 A new menu called "Web" will show up on Rhythmbox Menu Bar. You can also use the keyboard shortcuts.
+
+CHANGELOG:
+---------
+Version 0.8:
+- Bug fixed: now when no song is playing, the menu items are disabled-
+- The 'All' menu options now opens only the activated websites
+- Added "Look for updates" button in the Prefernces Window
+- Added 'All' option in the Prefernces Window
+- New look for the Prefernces Window
 
 BUGS AND SUGGESTIONS: 
 --------------------

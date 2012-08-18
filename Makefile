@@ -1,6 +1,7 @@
 PLUGIN_PATH=~/.local/share/rhythmbox/plugins/WebMenu
 install: upschema
 	@echo Installing Rhythmbox Web Menu:
+	@rm -Rf $(PLUGIN_PATH)
 	@mkdir -p $(PLUGIN_PATH)
 	@cp * $(PLUGIN_PATH) -Rf
 	@echo DONE!

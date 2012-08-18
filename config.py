@@ -1,4 +1,4 @@
-#WebMenu v.0.7
+#WebMenu v.0.8
 #Andrea Franco 18/08/2012
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@ from gi.repository import Gtk
 from gi.repository import RB
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.webmenu'
+CURRENT_VERSION = '0.8'
+ALBUM_LABELS = ['Wikipedia.com', 'AllMusic.com', 'RateYourMusic.com', 'DiscoGS.com', 'Facebook.com', 'All']
+ARTIST_LABELS = ['Wikipedia.com', 'AllMusic.com', 'RateYourMusic.com', 'DiscoGS.com', 'Official Website [beta]', 'Facebook.com', 'MySpace.com', 'Torrentz.com', 'All']
 
 class WMConfig(object):
     
@@ -42,39 +45,46 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
     def do_create_configure_widget(self):
         dialog = Gtk.VBox()
     	
+	vbox=Gtk.VBox(False, 15)
 	hbox=Gtk.HBox()
 
-	albumlabel = Gtk.Label(_("Album:")) #Frome here: 'Album' vertical box
-        albumvbox = Gtk.VBox()
-	albumvbox.pack_start(albumlabel, False, False, 0)
-        albumvbox.set_margin_left(30)
+	albumvbox = Gtk.VBox()
+	albumlabel = Gtk.Label("<b>Album Submenu:</b>", use_markup=True) #Frome here: 'Album' vertical box    
+	albumvbox.pack_start(albumlabel, False, False, 10)
+        albumvbox.set_margin_left(15)
+	albumvbox.set_margin_right(15)
         for website in self.settings["default-album-services"]:
-            check = Gtk.CheckButton(website)
+            check = Gtk.CheckButton(ALBUM_LABELS[self.settings["default-album-services"].index(website)])
             check.set_active(website in self.settings["active-album-services"])
             check.connect("toggled", self.website_toggled, website, "active-album-services")    
-            albumvbox.pack_start(check, True, True, 0)
+            albumvbox.pack_start(check, False, False, 0)
         
         hbox.pack_start(albumvbox, False, False, 0)
 
-	artistlabel = Gtk.Label(_("Artist:")) #Frome here: 'Artist' vertical box
-        artistvbox = Gtk.VBox()
-	artistvbox.pack_start(artistlabel, False, False, 0)
-        artistvbox.set_margin_left(30)
+	artistlabel = Gtk.Label("<b>Artist Submenu:</b>", use_markup=True) #Frome here: 'Artist' vertical box      
+	artistvbox = Gtk.VBox()
+	artistvbox.pack_start(artistlabel, False, False, 10)
+        artistvbox.set_margin_left(15)
+	artistvbox.set_margin_right(15)
         for website in self.settings["default-artist-services"]:
-            check = Gtk.CheckButton(website)
+            check = Gtk.CheckButton(ARTIST_LABELS[self.settings["default-artist-services"].index(website)])
             check.set_active(website in self.settings["active-artist-services"])
             check.connect("toggled", self.website_toggled, website, "active-artist-services")    
             artistvbox.pack_start(check, True, True, 0)
        
         hbox.pack_start(artistvbox, False, False, 0)
+	vbox.pack_start(hbox, False, False, 0)
 
-        dialog.pack_start(hbox, False, False, 0)
+	ubutton = Gtk.Button("Look for updates (Current Version: "+CURRENT_VERSION+")") #crea il pulsante
+	ubutton.connect("clicked", self.update_search)
+	vbox.pack_start(ubutton, False, False, 0)
+
+        dialog.pack_start(vbox, False, False, 0)
         dialog.show_all()
-        dialog.set_size_request(300, -1)
         
         return dialog
     
-        
+       
     def website_toggled(self, checkbutton, website, key):
         entries = self.settings[key]
         if checkbutton.get_active():
@@ -83,3 +93,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
             entries.remove(website)
             
         self.settings[key] = entries
+
+    def update_search(self, widget, data=None):
+	os.system("gnome-open https://github.com/afrancoto/WebMenu/downloads")
