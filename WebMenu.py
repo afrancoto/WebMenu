@@ -269,6 +269,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     shell = self.object
     ui_manager = shell.props.ui_manager
     ui_manager.remove_ui(self.ui_id)
+    del self.ui_id
+
+    ui_manager.remove_ui(self.ui_context_id)
+    del self.ui_context_id
+
 
 ##########
 #The "get_metadata" function gets and returns, in order, TITLE, ALBUM and ARTIST of the current playing song as elements of an array (0,1,2)
