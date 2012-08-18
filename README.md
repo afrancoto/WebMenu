@@ -38,7 +38,7 @@ A new menu called "Web" will show up on Rhythmbox Menu Bar. You can also use the
 CHANGELOG:
 ---------
 Version 0.8:
-- Bug fixed: now when no song is playing, the menu items are disabled-
+- Bug fixed: now when no song is playing, the menu items are disabled
 - The 'All' menu options now opens only the activated websites
 - Added "Look for updates" button in the Prefernces Window
 - Added 'All' option in the Prefernces Window

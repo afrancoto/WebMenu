@@ -52,6 +52,122 @@ web_menu_item = '''
   </ui>
 '''
 
+web_context_item = '''
+  <ui>
+    <popup name="QueuePlaylistViewPopup">
+	<placeholder name="PluginPlaceholder">
+        	<menuitem name="YTitem" action="search_on_youtube_action"/>
+		<menu name="AlbumMenu" action="album_menu_action">
+			<menuitem name="AL_wikipedia" action="album_wikipedia"/>
+			<menuitem name="AL_allmusic" action="album_allmusic"/>
+			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic"/>
+			<menuitem name="AL_discogs" action="album_discogs"/>
+			<menuitem name="AL_facebook" action="album_facebook"/>
+			<separator/>
+			<menuitem name="AL_all" action="album_all"/>
+			<separator/>
+		</menu>
+		<menu name="ArtistMenu" action="artist_menu_action">
+			<menuitem name="AR_wikipedia" action="artist_wikipedia"/>
+			<menuitem name="AR_allmusic" action="artist_allmusic"/>
+			<menuitem name="AR_rateyourmusic" action="artist_rateyourmusic"/>
+			<menuitem name="AR_discogs" action="artist_discogs"/>
+			<menuitem name="AR_official" action="artist_official"/>
+			<menuitem name="AR_facebook" action="artist_facebook"/>
+			<menuitem name="AR_myspace" action="artist_myspace"/>
+			<menuitem name="AR_torrentz" action="artist_torrentz"/>
+			<separator/>
+			<menuitem name="AR_all" action="artist_all"/>
+		</menu>
+      	</placeholder>
+    </popup>
+    
+    <popup name="BrowserSourceViewPopup">
+	<placeholder name="PluginPlaceholder">
+        	<menuitem name="YTitem" action="search_on_youtube_action"/>
+		<menu name="AlbumMenu" action="album_menu_action">
+			<menuitem name="AL_wikipedia" action="album_wikipedia"/>
+			<menuitem name="AL_allmusic" action="album_allmusic"/>
+			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic"/>
+			<menuitem name="AL_discogs" action="album_discogs"/>
+			<menuitem name="AL_facebook" action="album_facebook"/>
+			<separator/>
+			<menuitem name="AL_all" action="album_all"/>
+			<separator/>
+		</menu>
+		<menu name="ArtistMenu" action="artist_menu_action">
+			<menuitem name="AR_wikipedia" action="artist_wikipedia"/>
+			<menuitem name="AR_allmusic" action="artist_allmusic"/>
+			<menuitem name="AR_rateyourmusic" action="artist_rateyourmusic"/>
+			<menuitem name="AR_discogs" action="artist_discogs"/>
+			<menuitem name="AR_official" action="artist_official"/>
+			<menuitem name="AR_facebook" action="artist_facebook"/>
+			<menuitem name="AR_myspace" action="artist_myspace"/>
+			<menuitem name="AR_torrentz" action="artist_torrentz"/>
+			<separator/>
+			<menuitem name="AR_all" action="artist_all"/>
+		</menu>
+      	</placeholder>
+    </popup>
+
+    <popup name="PlaylistViewPopup">
+	<placeholder name="PluginPlaceholder">
+        	<menuitem name="YTitem" action="search_on_youtube_action"/>
+		<menu name="AlbumMenu" action="album_menu_action">
+			<menuitem name="AL_wikipedia" action="album_wikipedia"/>
+			<menuitem name="AL_allmusic" action="album_allmusic"/>
+			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic"/>
+			<menuitem name="AL_discogs" action="album_discogs"/>
+			<menuitem name="AL_facebook" action="album_facebook"/>
+			<separator/>
+			<menuitem name="AL_all" action="album_all"/>
+			<separator/>
+		</menu>
+		<menu name="ArtistMenu" action="artist_menu_action">
+			<menuitem name="AR_wikipedia" action="artist_wikipedia"/>
+			<menuitem name="AR_allmusic" action="artist_allmusic"/>
+			<menuitem name="AR_rateyourmusic" action="artist_rateyourmusic"/>
+			<menuitem name="AR_discogs" action="artist_discogs"/>
+			<menuitem name="AR_official" action="artist_official"/>
+			<menuitem name="AR_facebook" action="artist_facebook"/>
+			<menuitem name="AR_myspace" action="artist_myspace"/>
+			<menuitem name="AR_torrentz" action="artist_torrentz"/>
+			<separator/>
+			<menuitem name="AR_all" action="artist_all"/>
+		</menu>
+      	</placeholder>
+    </popup>
+
+    <popup name="PodcastViewPopup">
+	<placeholder name="PluginPlaceholder">
+        	<menuitem name="YTitem" action="search_on_youtube_action"/>
+		<menu name="AlbumMenu" action="album_menu_action">
+			<menuitem name="AL_wikipedia" action="album_wikipedia"/>
+			<menuitem name="AL_allmusic" action="album_allmusic"/>
+			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic"/>
+			<menuitem name="AL_discogs" action="album_discogs"/>
+			<menuitem name="AL_facebook" action="album_facebook"/>
+			<separator/>
+			<menuitem name="AL_all" action="album_all"/>
+			<separator/>
+		</menu>
+		<menu name="ArtistMenu" action="artist_menu_action">
+			<menuitem name="AR_wikipedia" action="artist_wikipedia"/>
+			<menuitem name="AR_allmusic" action="artist_allmusic"/>
+			<menuitem name="AR_rateyourmusic" action="artist_rateyourmusic"/>
+			<menuitem name="AR_discogs" action="artist_discogs"/>
+			<menuitem name="AR_official" action="artist_official"/>
+			<menuitem name="AR_facebook" action="artist_facebook"/>
+			<menuitem name="AR_myspace" action="artist_myspace"/>
+			<menuitem name="AR_torrentz" action="artist_torrentz"/>
+			<separator/>
+			<menuitem name="AR_all" action="artist_all"/>
+		</menu>
+      	</placeholder>
+    </popup>
+  </ui>
+'''
+
 class WebMenuPlugin(GObject.Object, Peas.Activatable):
   __gtype_name__ = 'WebMenuPlugin'
   object = GObject.property(type=GObject.Object)
@@ -82,7 +198,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     youtube_action = Gtk.Action ('search_on_youtube_action', _('Song on Youtube'), _('Look for the current playing song on Youtube'), "")
     youtube_action.connect ('activate', self.search_on_youtube, shell)
     action_group.add_action_with_accel (youtube_action, "<alt>Y")
-    action_group.add_action(youtube_action)
+    #action_group.add_action(youtube_action)
     #0.2 Album Menu
     album_menu_action = Gtk.Action("album_menu_action", _("Album"), None, None)
     action_group.add_action(album_menu_action)
@@ -90,7 +206,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     album_wikipedia_action = Gtk.Action ('album_wikipedia', _('Wikipedia'), _('Look for the current album on Wikipedia'), "")
     album_wikipedia_action.connect ('activate', self.search_on_wikipedia, shell, 1)  #The last argument "1" stands for "Album"
     action_group.add_action_with_accel (album_wikipedia_action, "<alt>W")
-    action_group.add_action(album_wikipedia_action)
+    #action_group.add_action(album_wikipedia_action)
     #0.2.2 Album -> AllMusic
     album_allmusic_action = Gtk.Action ('album_allmusic', _('AllMusic'), _('Look for the current album on AllMusic'), "")
     album_allmusic_action.connect ('activate', self.search_on_allmusic, shell, 1) #The last argument "1" stands for "Album"
@@ -122,7 +238,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     artist_allmusic_action = Gtk.Action ('artist_allmusic', _('AllMusic'), _('Look for the current artist on AllMusic'), "")
     artist_allmusic_action.connect ('activate', self.search_on_allmusic, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action_with_accel (artist_allmusic_action, "<alt>A")
-    action_group.add_action(artist_allmusic_action)
+    #action_group.add_action(artist_allmusic_action)
     #0.3.3 Artist -> RateYourMusic
     artsit_rateyourmusic_action = Gtk.Action ('artist_rateyourmusic', _('RateYourMusic'), _('Look for the current artsit on RateYourMusic'), "")
     artsit_rateyourmusic_action.connect ('activate', self.search_on_rateyourmusic, shell, 2) #The last argument "2" stands for "Artist"
@@ -147,7 +263,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     artist_torrentz_action = Gtk.Action ('artist_torrentz', _('Torrentz'), _('Look for the current artist on Torrentz'), "")
     artist_torrentz_action.connect ('activate', self.search_on_torrentz, shell) #No need to specify what to search
     action_group.add_action_with_accel (artist_torrentz_action, "<alt>T")
-    action_group.add_action(artist_torrentz_action)
+    #action_group.add_action(artist_torrentz_action)
     #0.3.9 Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all', _('All'), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, settings, 2) #The last argument "2" stands for "Artist"
@@ -155,6 +271,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     ui_manager = shell.props.ui_manager
     ui_manager.insert_action_group(action_group)
     self.ui_id = ui_manager.add_ui_from_string(web_menu_item)
+    self.ui_context_id = ui_manager.add_ui_from_string(web_context_item)
+
     ui_manager.ensure_update()
 
 ##########
@@ -198,6 +316,9 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     shell = self.object
     ui_manager = shell.props.ui_manager
     ui_manager.remove_ui(self.ui_id)
+    del self.ui_id
+    ui_manager.remove_ui(self.ui_context_id)
+    del self.ui_context_id
 
 ##########
 #The "get_metadata" function gets and returns, in order, TITLE, ALBUM and ARTIST of the current playing song as elements of an array (0,1,2)
