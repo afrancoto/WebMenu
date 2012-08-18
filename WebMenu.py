@@ -52,6 +52,74 @@ web_menu_item = '''
   </ui>
 '''
 
+web_context_item = '''
+  <ui>
+    <popup name="QueuePlaylistViewPopup">
+	<placeholder name="PluginPlaceholder">
+        	<menuitem name="YTitem" action="search_on_youtube_action"/>
+		<menu name="AlbumMenu" action="album_menu_action">
+			<menuitem name="AL_wikipedia" action="album_wikipedia"/>
+			<menuitem name="AL_allmusic" action="album_allmusic"/>
+			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic"/>
+			<menuitem name="AL_discogs" action="album_discogs"/>
+			<menuitem name="AL_facebook" action="album_facebook"/>
+			<separator/>
+			<menuitem name="AL_all" action="album_all"/>
+			<separator/>
+		</menu>
+      	</placeholder>
+    </popup>
+    
+    <popup name="BrowserSourceViewPopup">
+	<placeholder name="PluginPlaceholder">
+        	<menuitem name="YTitem" action="search_on_youtube_action"/>
+		<menu name="AlbumMenu" action="album_menu_action">
+			<menuitem name="AL_wikipedia" action="album_wikipedia"/>
+			<menuitem name="AL_allmusic" action="album_allmusic"/>
+			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic"/>
+			<menuitem name="AL_discogs" action="album_discogs"/>
+			<menuitem name="AL_facebook" action="album_facebook"/>
+			<separator/>
+			<menuitem name="AL_all" action="album_all"/>
+			<separator/>
+		</menu>
+      	</placeholder>
+    </popup>
+
+    <popup name="PlaylistViewPopup">
+	<placeholder name="PluginPlaceholder">
+        	<menuitem name="YTitem" action="search_on_youtube_action"/>
+		<menu name="AlbumMenu" action="album_menu_action">
+			<menuitem name="AL_wikipedia" action="album_wikipedia"/>
+			<menuitem name="AL_allmusic" action="album_allmusic"/>
+			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic"/>
+			<menuitem name="AL_discogs" action="album_discogs"/>
+			<menuitem name="AL_facebook" action="album_facebook"/>
+			<separator/>
+			<menuitem name="AL_all" action="album_all"/>
+			<separator/>
+		</menu>
+      	</placeholder>
+    </popup>
+
+    <popup name="PodcastViewPopup">
+	<placeholder name="PluginPlaceholder">
+        	<menuitem name="YTitem" action="search_on_youtube_action"/>
+		<menu name="AlbumMenu" action="album_menu_action">
+			<menuitem name="AL_wikipedia" action="album_wikipedia"/>
+			<menuitem name="AL_allmusic" action="album_allmusic"/>
+			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic"/>
+			<menuitem name="AL_discogs" action="album_discogs"/>
+			<menuitem name="AL_facebook" action="album_facebook"/>
+			<separator/>
+			<menuitem name="AL_all" action="album_all"/>
+			<separator/>
+		</menu>
+      	</placeholder>
+    </popup>
+  </ui>
+'''
+
 class WebMenuPlugin(GObject.Object, Peas.Activatable):
   __gtype_name__ = 'WebMenuPlugin'
   object = GObject.property(type=GObject.Object)
@@ -155,6 +223,9 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     ui_manager = shell.props.ui_manager
     ui_manager.insert_action_group(action_group)
     self.ui_id = ui_manager.add_ui_from_string(web_menu_item)
+    self.ui_context_id = ui_manager.add_ui_from_string(web_context_item)
+
+
     ui_manager.ensure_update()
 
 ##########
