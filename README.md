@@ -1,9 +1,9 @@
-RHYTHMBOX Web Menu 0.8
+RHYTHMBOX Web Menu 0.9
 ======================
 
 Rhythmbox v2.9x plugin.
 With one click you can:
-- Search current playing song on Youtube.
+- Search current playing/selected song on Youtube.
 - Search its album on Wikipedia, AllMusic, RateYourMusic, DiscoGS, Facebook.
 - Search its artist on Wikipedia, AllMusic, RateYourMusic, DiscoGS, Facebook, Myspace, Torrentz.
 - Open the artist official website.
@@ -15,6 +15,7 @@ DOWNLOAD:
 https://github.com/afrancoto/WebMenu/downloads
 
 ![Screenshot](http://s8.postimage.org/pnkzeoh5h/Schermata_del_2012_08_14_13_45_19.png)
+![Screenshot](http://s9.postimage.org/h5iiuhtbz/Schermata_del_2012_08_18_20_54_35.png)
 
 INSTALLATION: 
 ------------
@@ -33,10 +34,16 @@ You can choose which websites are shown by editing the plugin preferences:
 
 USE: 
 ----
-A new menu called "Web" will show up on Rhythmbox Menu Bar. You can also use the keyboard shortcuts.
+A new menu called "Web" will show up on Rhythmbox Menu Bar. 
+Its entries are also available in the context menu!
+You can also use the keyboard shortcuts.
 
 CHANGELOG:
 ---------
+Version 0.9:
+- Bug fixed: no more warning messages at start [thanks asermax]
+- Added context menu [thanks fossfreedom, asermax]
+
 Version 0.8:
 - Bug fixed: now when no song is playing, the menu items are disabled
 - The 'All' menu options now opens only the activated websites

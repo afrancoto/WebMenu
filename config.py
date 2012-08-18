@@ -1,4 +1,4 @@
-#WebMenu v.0.8
+#WebMenu v.0.9
 #Andrea Franco 18/08/2012
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ from gi.repository import Gtk
 from gi.repository import RB
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.webmenu'
-CURRENT_VERSION = '0.8'
+CURRENT_VERSION = '0.9'
 ALBUM_LABELS = ['Wikipedia.com', 'AllMusic.com', 'RateYourMusic.com', 'DiscoGS.com', 'Facebook.com', 'All']
 ARTIST_LABELS = ['Wikipedia.com', 'AllMusic.com', 'RateYourMusic.com', 'DiscoGS.com', 'Official Website [beta]', 'Facebook.com', 'MySpace.com', 'Torrentz.com', 'All']
 
