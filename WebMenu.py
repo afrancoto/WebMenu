@@ -280,15 +280,17 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
   def apply_settings(self, settings, key, shell, config):  
     self.settings = config.get_settings()
-    for website in self.settings["default-album-services"]: #Hides the non-active options in the "Album" submenu
-	menu_option="/MenuBar/WebMenu/AlbumMenu/AL_"+website
+    paths=["/MenuBar/WebMenu", "/QueuePlaylistViewPopup/PluginPlaceholder", "/BrowserSourceViewPopup/PluginPlaceholder", "/PlaylistViewPopup/PluginPlaceholder", "/PodcastViewPopup/PluginPlaceholder"]
+    for path in paths:
+     for website in self.settings["default-album-services"]: #Hides the non-active options in the "Album" submenu
+	menu_option=path+"/AlbumMenu/AL_"+website
 	if (website not in self.settings["active-album-services"]):
 		shell.props.ui_manager.get_widget(menu_option).hide()
 	else:
 		shell.props.ui_manager.get_widget(menu_option).show()
 
-    for website in self.settings["default-artist-services"]: #Hides the non-active options in the "Artist" submenu
-	menu_option="/MenuBar/WebMenu/ArtistMenu/AR_"+website
+     for website in self.settings["default-artist-services"]: #Hides the non-active options in the "Artist" submenu
+	menu_option=path+"/ArtistMenu/AR_"+website
 	if (website not in self.settings["active-artist-services"]):
 		shell.props.ui_manager.get_widget(menu_option).hide()
 	else:
