@@ -545,11 +545,4 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     self.playing_entry = s_props.shell_player.get_playing_entry() 
     now_is_playing=self.playing_entry is not None #current playing song==None --> False
 
-    s_props.ui_manager.get_widget("/MenuBar/WebMenu/YTitem").set_sensitive(now_is_playing)  #Disable the YouTube Option
-    for website in settings["default-album-services"]: #Disable all the options in the "Album" submenu
-	menu_option="/MenuBar/WebMenu/AlbumMenu/AL_"+website
-        s_props.ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
-    for website in settings["default-artist-services"]: #Enable all the options in the "Album" submenu
-	menu_option="/MenuBar/WebMenu/ArtistMenu/AR_"+website
-        s_props.ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
-
+    s_props.ui_manager.get_widget("/MenuBar/WebMenu").set_sensitive(now_is_playing)  #Disable the web menu
