@@ -4,7 +4,7 @@ RHYTHMBOX Web Menu 0.9
 Rhythmbox v2.9x plugin.
 With one click you can:
 - Search current playing/selected song on Youtube.
-- Search its album on Wikipedia, AllMusic, RateYourMusic, DiscoGS, Last.fm, Facebook.
+- Search its album on Wikipedia, AllMusic, RateYourMusic, AllaAboutJazz, DiscoGS, Last.fm, Facebook.
 - Search its artist on Wikipedia, AllMusic, RateYourMusic, DiscoGS, Last.fm, Facebook, Myspace, Torrentz.
 - Open the artist official website.
 
