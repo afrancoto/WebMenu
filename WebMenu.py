@@ -17,8 +17,8 @@ from gi.repository import GObject, RB, Peas, Gtk
 import os
 import urllib2
 
-from config import WMConfig
-from config import WMConfigDialog
+from WebMenu_config import WMConfig
+from WebMenu_config import WMConfigDialog
 
 web_menu_item = '''
   <ui>
