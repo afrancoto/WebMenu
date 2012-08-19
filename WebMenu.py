@@ -13,6 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+#To add a new service:
+#0. Decide a position for the service in the menu and keep it for every next step
+#1. Add the "web_menu_item" and the "web_context_menu" entries: the menu name must be AL_servicename/AR_servicename, the action album_servicename/artist_servicename and album_servicename_cx/artist_servicename_cx
+#2. Add actions (album and/or artist) in "draw_menu" and "draw_context_menu"
+#3. Add service name to "org.gnome.rhythmbox.plugins.webmenu.gschema.xml" in "default-*-services" <default> and in "active-*-services" <description>  (order is important)
+#4. Add an entry in "ALBUM_LABELS" and "ARTIST_LABELS" in WebMenu_config.py (order is important)
+#4. Add the search_on_service function
+#5. Add the entry in "search_on_all" function
+#6. Launch Rhythmbox, enable the service in WebMenu preferences and test it from both the menubar and the context menu
+#7. Add the service name in WebMenu.plugin and README.md
+
 from gi.repository import GObject, RB, Peas, Gtk
 import os
 import urllib2
@@ -31,6 +43,7 @@ web_menu_item = '''
 			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic"/>
 			<menuitem name="AL_discogs" action="album_discogs"/>
 			<menuitem name="AL_facebook" action="album_facebook"/>
+			<menuitem name="AL_lastfm" action="album_lastfm"/>
 			<separator/>
 			<menuitem name="AL_all" action="album_all"/>
 			<separator/>
@@ -42,6 +55,7 @@ web_menu_item = '''
 			<menuitem name="AR_discogs" action="artist_discogs"/>
 			<menuitem name="AR_official" action="artist_official"/>
 			<menuitem name="AR_facebook" action="artist_facebook"/>
+			<menuitem name="AR_lastfm" action="artist_lastfm"/>
 			<menuitem name="AR_myspace" action="artist_myspace"/>
 			<menuitem name="AR_torrentz" action="artist_torrentz"/>
 			<separator/>
@@ -63,6 +77,7 @@ web_context_item = '''
 			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic_cx"/>
 			<menuitem name="AL_discogs" action="album_discogs_cx"/>
 			<menuitem name="AL_facebook" action="album_facebook_cx"/>
+			<menuitem name="AL_lastfm" action="album_lastfm_cx"/>
 			<separator/>
 			<menuitem name="AL_all" action="album_all_cx"/>
 			<separator/>
@@ -74,6 +89,7 @@ web_context_item = '''
 			<menuitem name="AR_discogs" action="artist_discogs_cx"/>
 			<menuitem name="AR_official" action="artist_official_cx"/>
 			<menuitem name="AR_facebook" action="artist_facebook_cx"/>
+			<menuitem name="AR_lastfm" action="artist_lastfm_cx"/>
 			<menuitem name="AR_myspace" action="artist_myspace_cx"/>
 			<menuitem name="AR_torrentz" action="artist_torrentz_cx"/>
 			<separator/>
@@ -91,6 +107,7 @@ web_context_item = '''
 			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic_cx"/>
 			<menuitem name="AL_discogs" action="album_discogs_cx"/>
 			<menuitem name="AL_facebook" action="album_facebook_cx"/>
+			<menuitem name="AL_lastfm" action="album_lastfm_cx"/>
 			<separator/>
 			<menuitem name="AL_all" action="album_all_cx"/>
 			<separator/>
@@ -102,6 +119,7 @@ web_context_item = '''
 			<menuitem name="AR_discogs" action="artist_discogs_cx"/>
 			<menuitem name="AR_official" action="artist_official_cx"/>
 			<menuitem name="AR_facebook" action="artist_facebook_cx"/>
+			<menuitem name="AR_lastfm" action="artist_lastfm_cx"/>
 			<menuitem name="AR_myspace" action="artist_myspace_cx"/>
 			<menuitem name="AR_torrentz" action="artist_torrentz_cx"/>
 			<separator/>
@@ -119,6 +137,7 @@ web_context_item = '''
 			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic_cx"/>
 			<menuitem name="AL_discogs" action="album_discogs_cx"/>
 			<menuitem name="AL_facebook" action="album_facebook_cx"/>
+			<menuitem name="AL_lastfm" action="album_lastfm_cx"/>
 			<separator/>
 			<menuitem name="AL_all" action="album_all_cx"/>
 			<separator/>
@@ -130,6 +149,7 @@ web_context_item = '''
 			<menuitem name="AR_discogs" action="artist_discogs_cx"/>
 			<menuitem name="AR_official" action="artist_official_cx"/>
 			<menuitem name="AR_facebook" action="artist_facebook_cx"/>
+			<menuitem name="AR_lastfm" action="artist_lastfm_cx"/>
 			<menuitem name="AR_myspace" action="artist_myspace_cx"/>
 			<menuitem name="AR_torrentz" action="artist_torrentz_cx"/>
 			<separator/>
@@ -147,6 +167,7 @@ web_context_item = '''
 			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic_cx"/>
 			<menuitem name="AL_discogs" action="album_discogs_cx"/>
 			<menuitem name="AL_facebook" action="album_facebook_cx"/>
+			<menuitem name="AL_lastfm" action="album_lastfm_cx"/>
 			<separator/>
 			<menuitem name="AL_all" action="album_all_cx"/>
 			<separator/>
@@ -158,6 +179,7 @@ web_context_item = '''
 			<menuitem name="AR_discogs" action="artist_discogs_cx"/>
 			<menuitem name="AR_official" action="artist_official_cx"/>
 			<menuitem name="AR_facebook" action="artist_facebook_cx"/>
+			<menuitem name="AR_lastfm" action="artist_lastfm_cx"/>
 			<menuitem name="AR_myspace" action="artist_myspace_cx"/>
 			<menuitem name="AR_torrentz" action="artist_torrentz_cx"/>
 			<separator/>
@@ -182,11 +204,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #  2.
 #    1
 #    ...
-#    4
+#    7
 #  3.
 #    1
 #    ...
-#    6
+#    10
 ##########
 
   def draw_menu(self, shell, settings): 
@@ -217,11 +239,15 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     album_discogs_action = Gtk.Action ('album_discogs', _('DiscoGS'), _('Look for the current album on DiscoGS'), "")
     album_discogs_action.connect ('activate', self.search_on_discogs, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_discogs_action)
-    #0.2.5 Album -> Facebook
+    #0.2.5 Album -> Lastfm
+    album_lastfm_action = Gtk.Action ('album_lastfm', _('Last.fm'), _('Look for the current album on Last.fm'), "")
+    album_lastfm_action.connect ('activate', self.search_on_lastfm, shell, 1) #The last argument "1" stands for "Album"
+    action_group.add_action(album_lastfm_action)
+    #0.2.6 Album -> Facebook
     album_facebook_action = Gtk.Action ('album_facebook', _('Facebook'), _('Look for the current album on Facebook'), "")
     album_facebook_action.connect ('activate', self.search_on_facebook, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_facebook_action)
-    #0.2.6 Album -> Every Service
+    #0.2.7 Album -> Every Service
     album_all_action = Gtk.Action ('album_all', _('All'), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, settings, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_all_action)
@@ -248,19 +274,23 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     artist_official_action = Gtk.Action ('artist_official', _('Official Website'), _('Look for the current artist\'s official website'), "")
     artist_official_action.connect ('activate', self.search_on_official, shell) #No need to specify what to search
     action_group.add_action(artist_official_action)
-    #0.3.6 Artist -> Facebook
+    #0.3.6 Artist -> Lastfm
+    artsit_lastfm_action = Gtk.Action ('artist_lastfm', _('Last.fm'), _('Look for the current artsit on Last.fm'), "")
+    artsit_lastfm_action.connect ('activate', self.search_on_lastfm, shell, 2) #The last argument "2" stands for "Artist"
+    action_group.add_action(artsit_lastfm_action)
+    #0.3.7 Artist -> Facebook
     artist_facebook_action = Gtk.Action ('artist_facebook', _('Facebook'), _('Look for the current artist on Facebook'), "")
     artist_facebook_action.connect ('activate', self.search_on_facebook, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_facebook_action)
-    #0.3.7 Artist -> Myspace
+    #0.3.8 Artist -> Myspace
     artist_myspace_action = Gtk.Action ('artist_myspace', _('Myspace'), _('Look for the current artist on Myspace'), "")
     artist_myspace_action.connect ('activate', self.search_on_myspace, shell) #No need to specify what to search
     action_group.add_action(artist_myspace_action)
-    #0.3.8 Artist -> Torrentz
+    #0.3.9 Artist -> Torrentz
     artist_torrentz_action = Gtk.Action ('artist_torrentz', _('Torrentz'), _('Look for the current artist on Torrentz'), "")
     artist_torrentz_action.connect ('activate', self.search_on_torrentz, shell) #No need to specify what to search
     action_group.add_action_with_accel (artist_torrentz_action, "<alt>T")
-    #0.3.9 Artist -> Every Service
+    #0.3.10 Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all', _('All'), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, settings, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_all_action)
@@ -295,11 +325,15 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     album_discogs_action = Gtk.Action ('album_discogs_cx', _('DiscoGS'), _('Look for the current album on DiscoGS'), "")
     album_discogs_action.connect ('activate', self.search_on_discogs, shell, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu
     action_group.add_action(album_discogs_action)
-    #0.2.5 Album -> Facebook
+    #0.2.5 Album -> Lastfm
+    album_lastfm_action = Gtk.Action ('album_lastfm_cx', _('Last.fm'), _('Look for the current album on Last.fm'), "")
+    album_lastfm_action.connect ('activate', self.search_on_lastfm, shell, 1, True) #The last argument "1" stands for "Album"
+    action_group.add_action(album_lastfm_action)
+    #0.2.6 Album -> Facebook
     album_facebook_action = Gtk.Action ('album_facebook_cx', _('Facebook'), _('Look for the current album on Facebook'), "")
     album_facebook_action.connect ('activate', self.search_on_facebook, shell, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu
     action_group.add_action(album_facebook_action)
-    #0.2.6 Album -> Every Service
+    #0.2.7 Album -> Every Service
     album_all_action = Gtk.Action ('album_all_cx', _('All'), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, settings, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu"
     action_group.add_action(album_all_action)
@@ -323,19 +357,23 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     artist_official_action = Gtk.Action ('artist_official_cx', _('Official Website'), _('Look for the current artist\'s official website'), "")
     artist_official_action.connect ('activate', self.search_on_official, shell, True) #No need to specify what to search, "True" says that the command is launched from the context menu"
     action_group.add_action(artist_official_action)
-    #0.3.6 Artist -> Facebook
+    #0.3.6 Artist -> Lastfm
+    artsit_lastfm_action = Gtk.Action ('artist_lastfm_cx', _('Last.fm'), _('Look for the current artsit on Last.fm'), "")
+    artsit_lastfm_action.connect ('activate', self.search_on_lastfm, shell, 2, True) #The last argument "2" stands for "Artist"
+    action_group.add_action(artsit_lastfm_action)
+    #0.3.7 Artist -> Facebook
     artist_facebook_action = Gtk.Action ('artist_facebook_cx', _('Facebook'), _('Look for the current artist on Facebook'), "")
     artist_facebook_action.connect ('activate', self.search_on_facebook, shell, 2, True) #The last argument "2" stands for "Artist", "True" says that the command is launched from the context menu"
     action_group.add_action(artist_facebook_action)
-    #0.3.7 Artist -> Myspace
+    #0.3.8 Artist -> Myspace
     artist_myspace_action = Gtk.Action ('artist_myspace_cx', _('Myspace'), _('Look for the current artist on Myspace'), "")
     artist_myspace_action.connect ('activate', self.search_on_myspace, shell, True) #No need to specify what to search, "True" says that the command is launched from the context menu"
     action_group.add_action(artist_myspace_action)
-    #0.3.8 Artist -> Torrentz
+    #0.3.9 Artist -> Torrentz
     artist_torrentz_action = Gtk.Action ('artist_torrentz_cx', _('Torrentz'), _('Look for the current artist on Torrentz'), "")
     artist_torrentz_action.connect ('activate', self.search_on_torrentz, shell, True) #No need to specify what to search, "True" says that the command is launched from the context menu"
     action_group.add_action_with_accel (artist_torrentz_action, "<alt>T")
-    #0.3.9 Artist -> Every Service
+    #0.3.10 Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all_cx', _('All'), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, settings, 2, True) #The last argument "2" stands for "Artist", "True" says that the command is launched from the context menu"
     action_group.add_action(artist_all_action)
@@ -468,6 +506,15 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     os.system(command)
 
 ##########
+#The "search_on_lastfm" function search the artist OR the album on lastfm; "what" argument: 0=title (not used), 1=album, 2=artist
+##########
+  def search_on_lastfm(self, event, shell, what, context=False):
+    metadata=self.get_metadata(shell, context) #Calls "get_metadata"
+    what_text=['track', 'album', 'artist'] #Lastfm uses differt search engines for Songs, Albums and Artists
+    command="gnome-open \"http://www.last.fm/search?type=" + what_text[what] + "&q=" + urllib2.quote(metadata[what]) + "\""
+    os.system(command)
+
+##########
 #The "search_on_facebook" function search the artist OR the album on facebook; "what" argument: 0=title (not used), 1=album, 2=artist
 ##########
   def search_on_facebook(self, event, shell, what, context=False):
@@ -502,7 +549,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     if 'rateyourmusic' in settings[what_in_letters[what-1]]: self.search_on_rateyourmusic('activate', shell, what, context)
     if 'discogs' in settings[what_in_letters[what-1]]: self.search_on_discogs('activate', shell, what, context)
     if 'official' in settings[what_in_letters[what-1]]: self.search_on_official('activate', shell, context)
-    if 'facebook' in settings[what_in_letters[what-1]]: self.search_on_facebook('activate', shell, what, context)
+    if 'lastfm' in settings[what_in_letters[what-1]]: self.search_on_facebook('activate', shell, what, context)
+    if 'facebook' in settings[what_in_letters[what-1]]: self.search_on_lastfm('activate', shell, what, context)
     if 'myspace' in settings[what_in_letters[what-1]]: self.search_on_myspace('activate', shell, context)
     if 'torrentz' in settings[what_in_letters[what-1]]:  self.search_on_torrentz('activate', shell, context)
 

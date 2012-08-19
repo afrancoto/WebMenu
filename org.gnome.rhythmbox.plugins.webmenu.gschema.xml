@@ -3,7 +3,7 @@
   <schema id="org.gnome.rhythmbox.plugins.webmenu" path="/org/gnome/rhythmbox/plugins/webmenu/">
 
     <key type="as" name="default-album-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'facebook', 'all']</default>
+      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'lastfm', 'facebook', 'all']</default>
       <summary>Album menu</summary>
       <description>Do NOT change this.</description>
     </key>
@@ -11,11 +11,11 @@
     <key type="as" name="active-album-services">
       <default>['wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'facebook', 'all']</default>
       <summary>Album menu</summary>
-      <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'facebook', 'all'</description>
+      <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'lastfm', 'facebook', 'all'</description>
     </key>
 
     <key type="as" name="default-artist-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'official', 'facebook', 'myspace', 'torrentz', 'all']</default>
+      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'official', 'lastfm', 'facebook', 'myspace', 'torrentz', 'all']</default>
       <summary>Artist menu</summary>
       <description>Do NOT change this.</description>
     </key>
@@ -23,7 +23,7 @@
     <key type="as" name="active-artist-services">
       <default>['wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'facebook', 'myspace', 'torrentz', 'all']</default>
       <summary>Artist menu</summary>
-      <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'official', 'facebook', 'myspace', 'torrentz', 'all'</description>
+      <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'official', 'lastfm', 'facebook', 'myspace', 'torrentz', 'all'</description>
     </key>
 
   </schema>
