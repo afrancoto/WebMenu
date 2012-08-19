@@ -379,9 +379,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     self.settings.connect('changed', self.apply_settings, shell, config) #Connects a change in the settings menus to "apply_settings"
 
     sp=shell.props.shell_player #Connects play/stop events to "song_changed")
-    print "do activate"
     sp.connect ('playing-changed', self.song_changed, shell.props, config.get_settings())
-    self.update_menu(shell.props, config.get_settings())
+    self.song_changed('start', '', shell.props, config.get_settings())
 
 ##########
 #The "do_deactivate" function removes the 'Web' Menu and the context menu
@@ -511,10 +510,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "song_changed" function controls if no song is playing. If it is so, the 'Web' menu options are disabled.
 ##########
   def song_changed(self, playing, user_data, s_props, settings):
-    self.update_menu( s_props, settings )
-
-  def update_menu(self, s_props, settings):
-    print "song_changed"
     self.playing_entry = s_props.shell_player.get_playing_entry() 
     now_is_playing=self.playing_entry is not None #current playing song==None --> False
 
