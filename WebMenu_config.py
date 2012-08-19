@@ -23,7 +23,7 @@ from gi.repository import RB
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.webmenu'
 CURRENT_VERSION = '0.9'
-ALBUM_LABELS = ['Wikipedia', 'AllMusic', 'RateYourMusic', 'AllAboutJazz', 'DiscoGS', 'Last.fm', 'Facebook', 'All']
+ALBUM_LABELS = ['Wikipedia', 'AllMusic', 'RateYourMusic', 'AllAboutJazz', 'DiscoGS', 'Last.fm', 'Facebook', 'Amazon', 'All']
 ARTIST_LABELS = ['Wikipedia', 'AllMusic', 'RateYourMusic', 'DiscoGS', 'Official Website [beta]', 'Last.fm', 'Facebook', 'MySpace', 'Torrentz', 'All']
 
 class WMConfig(object):

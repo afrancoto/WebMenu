@@ -16,7 +16,7 @@
 
 #To add a new service:
 #0. Decide a position for the service in the menu and keep it for every next step
-#1. Add the "web_menu_item" and the "web_context_menu" entries: the menu name must be AL_servicename/AR_servicename, the action album_servicename/artist_servicename and album_servicename_cx/artist_servicename_cx
+#1. Add the "web_menu_item" and the "web_context_part" entries: the menu name must be AL_servicename/AR_servicename, the action album_servicename/artist_servicename and album_servicename_cx/artist_servicename_cx
 #2. Add actions (album and/or artist) in "draw_menu" and "draw_context_menu" (update position numbers!)
 #3. Add service name (lowercase) to "org.gnome.rhythmbox.plugins.webmenu.gschema.xml" in "default-*-services" <default> and in "active-*-services" <description>  (order is important)
 #4. Add an entry in "ALBUM_LABELS" and "ARTIST_LABELS" in WebMenu_config.py (order is important)
@@ -45,6 +45,7 @@ web_menu_item = '''
 			<menuitem name="AL_discogs" action="album_discogs"/>
 			<menuitem name="AL_facebook" action="album_facebook"/>
 			<menuitem name="AL_lastfm" action="album_lastfm"/>
+			<menuitem name="AL_amazon" action="album_amazon"/>
 			<separator/>
 			<menuitem name="AL_all" action="album_all"/>
 			<separator/>
@@ -67,130 +68,54 @@ web_menu_item = '''
   </ui>
 '''
 
+web_context_part = '''
+	<placeholder name="PluginPlaceholder">
+          	<menuitem name="YTitem" action="search_on_youtube_action_cx"/>
+		<menu name="AlbumMenu" action="album_menu_action">
+			<menuitem name="AL_wikipedia" action="album_wikipedia_cx"/>
+			<menuitem name="AL_allmusic" action="album_allmusic_cx"/>
+			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic_cx"/>
+			<menuitem name="AL_allaboutjazz" action="album_allaboutjazz_cx"/>
+			<menuitem name="AL_discogs" action="album_discogs_cx"/>
+			<menuitem name="AL_facebook" action="album_facebook_cx"/>
+			<menuitem name="AL_lastfm" action="album_lastfm_cx"/>
+			<menuitem name="AL_amazon" action="album_amazon_cx"/>
+			<separator/>
+			<menuitem name="AL_all" action="album_all_cx"/>
+			<separator/>
+		</menu>
+		<menu name="ArtistMenu" action="artist_menu_action">
+			<menuitem name="AR_wikipedia" action="artist_wikipedia_cx"/>
+			<menuitem name="AR_allmusic" action="artist_allmusic_cx"/>
+			<menuitem name="AR_rateyourmusic" action="artist_rateyourmusic_cx"/>
+			<menuitem name="AR_discogs" action="artist_discogs_cx"/>
+			<menuitem name="AR_official" action="artist_official_cx"/>
+			<menuitem name="AR_facebook" action="artist_facebook_cx"/>
+			<menuitem name="AR_lastfm" action="artist_lastfm_cx"/>
+			<menuitem name="AR_myspace" action="artist_myspace_cx"/>
+			<menuitem name="AR_torrentz" action="artist_torrentz_cx"/>
+			<separator/>
+			<menuitem name="AR_all" action="artist_all_cx"/>
+		</menu>
+      	</placeholder>
+'''
+
 web_context_item = '''
   <ui>
     <popup name="QueuePlaylistViewPopup">
-	<placeholder name="PluginPlaceholder">
-        	<menuitem name="YTitem" action="search_on_youtube_action_cx"/>
-		<menu name="AlbumMenu" action="album_menu_action">
-			<menuitem name="AL_wikipedia" action="album_wikipedia_cx"/>
-			<menuitem name="AL_allmusic" action="album_allmusic_cx"/>
-			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic_cx"/>
-			<menuitem name="AL_allaboutjazz" action="album_allaboutjazz_cx"/>
-			<menuitem name="AL_discogs" action="album_discogs_cx"/>
-			<menuitem name="AL_facebook" action="album_facebook_cx"/>
-			<menuitem name="AL_lastfm" action="album_lastfm_cx"/>
-			<separator/>
-			<menuitem name="AL_all" action="album_all_cx"/>
-			<separator/>
-		</menu>
-		<menu name="ArtistMenu" action="artist_menu_action">
-			<menuitem name="AR_wikipedia" action="artist_wikipedia_cx"/>
-			<menuitem name="AR_allmusic" action="artist_allmusic_cx"/>
-			<menuitem name="AR_rateyourmusic" action="artist_rateyourmusic_cx"/>
-			<menuitem name="AR_discogs" action="artist_discogs_cx"/>
-			<menuitem name="AR_official" action="artist_official_cx"/>
-			<menuitem name="AR_facebook" action="artist_facebook_cx"/>
-			<menuitem name="AR_lastfm" action="artist_lastfm_cx"/>
-			<menuitem name="AR_myspace" action="artist_myspace_cx"/>
-			<menuitem name="AR_torrentz" action="artist_torrentz_cx"/>
-			<separator/>
-			<menuitem name="AR_all" action="artist_all_cx"/>
-		</menu>
-      	</placeholder>
+''' + web_context_part + '''
     </popup>
     
     <popup name="BrowserSourceViewPopup">
-	<placeholder name="PluginPlaceholder">
-        	<menuitem name="YTitem" action="search_on_youtube_action_cx"/>
-		<menu name="AlbumMenu" action="album_menu_action">
-			<menuitem name="AL_wikipedia" action="album_wikipedia_cx"/>
-			<menuitem name="AL_allmusic" action="album_allmusic_cx"/>
-			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic_cx"/>
-			<menuitem name="AL_allaboutjazz" action="album_allaboutjazz_cx"/>
-			<menuitem name="AL_discogs" action="album_discogs_cx"/>
-			<menuitem name="AL_facebook" action="album_facebook_cx"/>
-			<menuitem name="AL_lastfm" action="album_lastfm_cx"/>
-			<separator/>
-			<menuitem name="AL_all" action="album_all_cx"/>
-			<separator/>
-		</menu>
-		<menu name="ArtistMenu" action="artist_menu_action">
-			<menuitem name="AR_wikipedia" action="artist_wikipedia_cx"/>
-			<menuitem name="AR_allmusic" action="artist_allmusic_cx"/>
-			<menuitem name="AR_rateyourmusic" action="artist_rateyourmusic_cx"/>
-			<menuitem name="AR_discogs" action="artist_discogs_cx"/>
-			<menuitem name="AR_official" action="artist_official_cx"/>
-			<menuitem name="AR_facebook" action="artist_facebook_cx"/>
-			<menuitem name="AR_lastfm" action="artist_lastfm_cx"/>
-			<menuitem name="AR_myspace" action="artist_myspace_cx"/>
-			<menuitem name="AR_torrentz" action="artist_torrentz_cx"/>
-			<separator/>
-			<menuitem name="AR_all" action="artist_all_cx"/>
-		</menu>
-      	</placeholder>
+''' + web_context_part + '''
     </popup>
 
     <popup name="PlaylistViewPopup">
-	<placeholder name="PluginPlaceholder">
-        	<menuitem name="YTitem" action="search_on_youtube_action_cx"/>
-		<menu name="AlbumMenu" action="album_menu_action">
-			<menuitem name="AL_wikipedia" action="album_wikipedia_cx"/>
-			<menuitem name="AL_allmusic" action="album_allmusic_cx"/>
-			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic_cx"/>
-			<menuitem name="AL_allaboutjazz" action="album_allaboutjazz_cx"/>
-			<menuitem name="AL_discogs" action="album_discogs_cx"/>
-			<menuitem name="AL_facebook" action="album_facebook_cx"/>
-			<menuitem name="AL_lastfm" action="album_lastfm_cx"/>
-			<separator/>
-			<menuitem name="AL_all" action="album_all_cx"/>
-			<separator/>
-		</menu>
-		<menu name="ArtistMenu" action="artist_menu_action">
-			<menuitem name="AR_wikipedia" action="artist_wikipedia_cx"/>
-			<menuitem name="AR_allmusic" action="artist_allmusic_cx"/>
-			<menuitem name="AR_rateyourmusic" action="artist_rateyourmusic_cx"/>
-			<menuitem name="AR_discogs" action="artist_discogs_cx"/>
-			<menuitem name="AR_official" action="artist_official_cx"/>
-			<menuitem name="AR_facebook" action="artist_facebook_cx"/>
-			<menuitem name="AR_lastfm" action="artist_lastfm_cx"/>
-			<menuitem name="AR_myspace" action="artist_myspace_cx"/>
-			<menuitem name="AR_torrentz" action="artist_torrentz_cx"/>
-			<separator/>
-			<menuitem name="AR_all" action="artist_all_cx"/>
-		</menu>
-      	</placeholder>
+''' + web_context_part + '''
     </popup>
 
     <popup name="PodcastViewPopup">
-	<placeholder name="PluginPlaceholder">
-        	<menuitem name="YTitem" action="search_on_youtube_action_cx"/>
-		<menu name="AlbumMenu" action="album_menu_action">
-			<menuitem name="AL_wikipedia" action="album_wikipedia_cx"/>
-			<menuitem name="AL_allmusic" action="album_allmusic_cx"/>
-			<menuitem name="AL_rateyourmusic" action="album_rateyourmusic_cx"/>
-			<menuitem name="AL_allaboutjazz" action="album_allaboutjazz_cx"/>
-			<menuitem name="AL_discogs" action="album_discogs_cx"/>
-			<menuitem name="AL_facebook" action="album_facebook_cx"/>
-			<menuitem name="AL_lastfm" action="album_lastfm_cx"/>
-			<separator/>
-			<menuitem name="AL_all" action="album_all_cx"/>
-			<separator/>
-		</menu>
-		<menu name="ArtistMenu" action="artist_menu_action">
-			<menuitem name="AR_wikipedia" action="artist_wikipedia_cx"/>
-			<menuitem name="AR_allmusic" action="artist_allmusic_cx"/>
-			<menuitem name="AR_rateyourmusic" action="artist_rateyourmusic_cx"/>
-			<menuitem name="AR_discogs" action="artist_discogs_cx"/>
-			<menuitem name="AR_official" action="artist_official_cx"/>
-			<menuitem name="AR_facebook" action="artist_facebook_cx"/>
-			<menuitem name="AR_lastfm" action="artist_lastfm_cx"/>
-			<menuitem name="AR_myspace" action="artist_myspace_cx"/>
-			<menuitem name="AR_torrentz" action="artist_torrentz_cx"/>
-			<separator/>
-			<menuitem name="AR_all" action="artist_all_cx"/>
-		</menu>
-      	</placeholder>
+''' + web_context_part + '''
     </popup>
   </ui>
 '''
@@ -209,7 +134,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #  2.
 #    1
 #    ...
-#    8
+#    9
 #  3.
 #    1
 #    ...
@@ -256,7 +181,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     album_facebook_action = Gtk.Action ('album_facebook', _('Facebook'), _('Look for the current album on Facebook'), "")
     album_facebook_action.connect ('activate', self.search_on_facebook, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_facebook_action)
-    #0.2.8 Album -> Every Service
+    #0.2.8 Album -> Amazon
+    album_amazon_action = Gtk.Action ('album_amazon', _('Amazon'), _('Look for the current album on Amazon'), "")
+    album_amazon_action.connect ('activate', self.search_on_amazon, shell) #The last argument "1" stands for "Album"
+    action_group.add_action(album_amazon_action)
+    #0.2.9 Album -> Every Service
     album_all_action = Gtk.Action ('album_all', _('All'), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, settings, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_all_action)
@@ -346,7 +275,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     album_facebook_action = Gtk.Action ('album_facebook_cx', _('Facebook'), _('Look for the current album on Facebook'), "")
     album_facebook_action.connect ('activate', self.search_on_facebook, shell, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu
     action_group.add_action(album_facebook_action)
-    #0.2.8 Album -> Every Service
+    #0.2.8 Album -> Amazon
+    album_amazon_action = Gtk.Action ('album_amazon_cx', _('Amazon'), _('Look for the current album on Amazon'), "")
+    album_amazon_action.connect ('activate', self.search_on_amazon, shell, True) #No need to specify what to search, "True" says that the command is launched from the context menu"
+    action_group.add_action(album_amazon_action)
+    #0.2.9 Album -> Every Service
     album_all_action = Gtk.Action ('album_all_cx', _('All'), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, settings, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu"
     action_group.add_action(album_all_action)
@@ -501,11 +434,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     os.system(command)
 
 ##########
-#The "search_on_allaboutjazz" function search the album on allaboutjazz
+#The "search_on_allaboutjazz" function search the ARTIST + ALBUM on allaboutjazz
 ##########
   def search_on_allaboutjazz(self, event, shell, context=False):
     metadata=self.get_metadata(shell, context) #Calls "get_metadata"
-    command="gnome-open \"http://www.allaboutjazz.com/googlesearch.php?cx=005595936876858408448%3Ahfhqnzuknl8&cof=FORID%3A11&q=" + urllib2.quote(metadata[2] + " " + metadata[1] + " review") + "\""  #If you're looking for the album, the artist is added to get better results
+    command="gnome-open \"http://www.allaboutjazz.com/googlesearch.php?cx=005595936876858408448%3Ahfhqnzuknl8&cof=FORID%3A11&q=" + urllib2.quote(metadata[2] + " " + metadata[1]) + "\""  #If you're looking for the album, the artist is added to get better results
     os.system(command)
 
 ##########
@@ -552,6 +485,14 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     os.system(command)
 
 ##########
+#The "search_on_amazon" function search ARTIST + ALBUM on amazon
+##########
+  def search_on_amazon(self, event, shell, context=False):
+    metadata=self.get_metadata(shell, context) #Calls "get_metadata"
+    command="gnome-open \"http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Dpopular&field-keywords=" + urllib2.quote(metadata[2]) + " " + urllib2.quote(metadata[1]) + "\""
+    os.system(command)
+
+##########
 #The "search_on_torrentz" function search ARTIST on torrentz
 ##########
   def search_on_torrentz(self, event, shell, context=False):
@@ -574,6 +515,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     if 'lastfm' in settings[what_in_letters[what-1]]: self.search_on_facebook('activate', shell, what, context)
     if 'facebook' in settings[what_in_letters[what-1]]: self.search_on_lastfm('activate', shell, what, context)
     if 'myspace' in settings[what_in_letters[what-1]]: self.search_on_myspace('activate', shell, context)
+    if 'amazon' in settings[what_in_letters[what-1]]:  self.search_on_amazon('activate', shell, context)
     if 'torrentz' in settings[what_in_letters[what-1]]:  self.search_on_torrentz('activate', shell, context)
 
 ##########
