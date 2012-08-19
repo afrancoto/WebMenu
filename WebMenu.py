@@ -1,5 +1,5 @@
-#WebMenu v.0.9
-#Andrea Franco 18/08/2012
+#WebMenu v.1.0
+#Andrea Franco 19/08/2012
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -31,6 +31,7 @@ import urllib2
 
 from WebMenu_config import WMConfig
 from WebMenu_config import WMConfigDialog
+from WebMenu_config import ALBUM_LABELS, ARTIST_LABELS
 
 web_menu_item = '''
   <ui>
@@ -45,6 +46,7 @@ web_menu_item = '''
 			<menuitem name="AL_discogs" action="album_discogs"/>
 			<menuitem name="AL_facebook" action="album_facebook"/>
 			<menuitem name="AL_lastfm" action="album_lastfm"/>
+			<menuitem name="AL_grooveshark" action="album_grooveshark"/>
 			<menuitem name="AL_amazon" action="album_amazon"/>
 			<separator/>
 			<menuitem name="AL_all" action="album_all"/>
@@ -79,6 +81,7 @@ web_context_part = '''
 			<menuitem name="AL_discogs" action="album_discogs_cx"/>
 			<menuitem name="AL_facebook" action="album_facebook_cx"/>
 			<menuitem name="AL_lastfm" action="album_lastfm_cx"/>
+			<menuitem name="AL_grooveshark" action="album_grooveshark_cx"/>
 			<menuitem name="AL_amazon" action="album_amazon_cx"/>
 			<separator/>
 			<menuitem name="AL_all" action="album_all_cx"/>
@@ -134,7 +137,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #  2.
 #    1
 #    ...
-#    9
+#    10
 #  3.
 #    1
 #    ...
@@ -154,82 +157,86 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     album_menu_action = Gtk.Action("album_menu_action", _("Album"), None, None)
     action_group.add_action(album_menu_action)
     #0.2.1 Album -> Wikipedia
-    album_wikipedia_action = Gtk.Action ('album_wikipedia', _('Wikipedia'), _('Look for the current album on Wikipedia'), "")
+    album_wikipedia_action = Gtk.Action ('album_wikipedia', _(ALBUM_LABELS[0]), _('Look for the current album on Wikipedia'), "")
     album_wikipedia_action.connect ('activate', self.search_on_wikipedia, shell, 1)  #The last argument "1" stands for "Album"
     action_group.add_action_with_accel (album_wikipedia_action, "<alt>W")
     #0.2.2 Album -> AllMusic
-    album_allmusic_action = Gtk.Action ('album_allmusic', _('AllMusic'), _('Look for the current album on AllMusic'), "")
+    album_allmusic_action = Gtk.Action ('album_allmusic', _(ALBUM_LABELS[1]), _('Look for the current album on AllMusic'), "")
     album_allmusic_action.connect ('activate', self.search_on_allmusic, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_allmusic_action)
     #0.2.3 Album -> RateYourMusic
-    album_rateyourmusic_action = Gtk.Action ('album_rateyourmusic', _('RateYourMusic'), _('Look for the current album on RateYourMusic'), "")
+    album_rateyourmusic_action = Gtk.Action ('album_rateyourmusic', _(ALBUM_LABELS[2]), _('Look for the current album on RateYourMusic'), "")
     album_rateyourmusic_action.connect ('activate', self.search_on_rateyourmusic, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_rateyourmusic_action)
     #0.2.4 Album -> AllAboutJazz
-    album_allaboutjazz_action = Gtk.Action ('album_allaboutjazz', _('AllAboutJazz'), _('Look for the current album on AllAboutJazz'), "")
-    album_allaboutjazz_action.connect ('activate', self.search_on_allaboutjazz, shell, 1) #The last argument "1" stands for "Album"
+    album_allaboutjazz_action = Gtk.Action ('album_allaboutjazz', _(ALBUM_LABELS[3]), _('Look for the current album on AllAboutJazz'), "")
+    album_allaboutjazz_action.connect ('activate', self.search_on_allaboutjazz, shell) #The last argument "1" stands for "Album"
     action_group.add_action(album_allaboutjazz_action)
     #0.2.5 Album -> DiscoGS
-    album_discogs_action = Gtk.Action ('album_discogs', _('DiscoGS'), _('Look for the current album on DiscoGS'), "")
+    album_discogs_action = Gtk.Action ('album_discogs', _(ALBUM_LABELS[4]), _('Look for the current album on DiscoGS'), "")
     album_discogs_action.connect ('activate', self.search_on_discogs, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_discogs_action)
     #0.2.6 Album -> Lastfm
-    album_lastfm_action = Gtk.Action ('album_lastfm', _('Last.fm'), _('Look for the current album on Last.fm'), "")
+    album_lastfm_action = Gtk.Action ('album_lastfm', _(ALBUM_LABELS[5]), _('Look for the current album on Last.fm'), "")
     album_lastfm_action.connect ('activate', self.search_on_lastfm, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_lastfm_action)
-    #0.2.7 Album -> Facebook
-    album_facebook_action = Gtk.Action ('album_facebook', _('Facebook'), _('Look for the current album on Facebook'), "")
+    #0.2.7 Album -> Grooveshark
+    album_grooveshark_action = Gtk.Action ('album_grooveshark', _(ALBUM_LABELS[6]), _('Look for the current album on Grooveshark'), "")
+    album_grooveshark_action.connect ('activate', self.search_on_grooveshark, shell) #The last argument "1" stands for "Album"
+    action_group.add_action(album_grooveshark_action)
+    #0.2.8 Album -> Facebook
+    album_facebook_action = Gtk.Action ('album_facebook', _(ALBUM_LABELS[7]), _('Look for the current album on Facebook'), "")
     album_facebook_action.connect ('activate', self.search_on_facebook, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_facebook_action)
-    #0.2.8 Album -> Amazon
-    album_amazon_action = Gtk.Action ('album_amazon', _('Amazon'), _('Look for the current album on Amazon'), "")
+    #0.2.9 Album -> Amazon
+    album_amazon_action = Gtk.Action ('album_amazon', _(ALBUM_LABELS[8]), _('Look for the current album on Amazon'), "")
     album_amazon_action.connect ('activate', self.search_on_amazon, shell) #The last argument "1" stands for "Album"
     action_group.add_action(album_amazon_action)
-    #0.2.9 Album -> Every Service
-    album_all_action = Gtk.Action ('album_all', _('All'), _('Look for the current album on every service'), "")
+    #0.2.10 Album -> Every Service
+    album_all_action = Gtk.Action ('album_all', _(ALBUM_LABELS[9]), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, settings, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_all_action)
     #0.3 Artist Menu
     artist_menu_action = Gtk.Action("artist_menu_action", _("Artist"), None, None)
     action_group.add_action(artist_menu_action)
     #0.3.1 Artist -> Wikipedia
-    artist_wikipedia_action = Gtk.Action ('artist_wikipedia', _('Wikipedia'), _('Look for the current artist on Wikipedia'), "")
+    artist_wikipedia_action = Gtk.Action ('artist_wikipedia', _(ARTIST_LABELS[0]), _('Look for the current artist on Wikipedia'), "")
     artist_wikipedia_action.connect ('activate', self.search_on_wikipedia, shell, 2)  #The last argument "2" stands for "Artist"
     action_group.add_action(artist_wikipedia_action)
     #0.3.2 Artist -> AllMusic
-    artist_allmusic_action = Gtk.Action ('artist_allmusic', _('AllMusic'), _('Look for the current artist on AllMusic'), "")
+    artist_allmusic_action = Gtk.Action ('artist_allmusic', _(ARTIST_LABELS[1]), _('Look for the current artist on AllMusic'), "")
     artist_allmusic_action.connect ('activate', self.search_on_allmusic, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action_with_accel (artist_allmusic_action, "<alt>A")
     #0.3.3 Artist -> RateYourMusic
-    artsit_rateyourmusic_action = Gtk.Action ('artist_rateyourmusic', _('RateYourMusic'), _('Look for the current artsit on RateYourMusic'), "")
+    artsit_rateyourmusic_action = Gtk.Action ('artist_rateyourmusic', _(ARTIST_LABELS[2]), _('Look for the current artsit on RateYourMusic'), "")
     artsit_rateyourmusic_action.connect ('activate', self.search_on_rateyourmusic, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artsit_rateyourmusic_action)
     #0.3.4 Artist -> DiscoGS
-    artist_discogs_action = Gtk.Action ('artist_discogs', _('DiscoGS'), _('Look for the current artist on DiscoGS'), "")
+    artist_discogs_action = Gtk.Action ('artist_discogs', _(ARTIST_LABELS[3]), _('Look for the current artist on DiscoGS'), "")
     artist_discogs_action.connect ('activate', self.search_on_discogs, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_discogs_action)
     #0.3.5 Artist -> Official Website
-    artist_official_action = Gtk.Action ('artist_official', _('Official Website'), _('Look for the current artist\'s official website'), "")
+    artist_official_action = Gtk.Action ('artist_official', _(ARTIST_LABELS[4]), _('Look for the current artist\'s official website'), "")
     artist_official_action.connect ('activate', self.search_on_official, shell) #No need to specify what to search
     action_group.add_action(artist_official_action)
     #0.3.6 Artist -> Lastfm
-    artsit_lastfm_action = Gtk.Action ('artist_lastfm', _('Last.fm'), _('Look for the current artsit on Last.fm'), "")
+    artsit_lastfm_action = Gtk.Action ('artist_lastfm', _(ARTIST_LABELS[5]), _('Look for the current artsit on Last.fm'), "")
     artsit_lastfm_action.connect ('activate', self.search_on_lastfm, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artsit_lastfm_action)
     #0.3.7 Artist -> Facebook
-    artist_facebook_action = Gtk.Action ('artist_facebook', _('Facebook'), _('Look for the current artist on Facebook'), "")
+    artist_facebook_action = Gtk.Action ('artist_facebook', _(ARTIST_LABELS[6]), _('Look for the current artist on Facebook'), "")
     artist_facebook_action.connect ('activate', self.search_on_facebook, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_facebook_action)
     #0.3.8 Artist -> Myspace
-    artist_myspace_action = Gtk.Action ('artist_myspace', _('Myspace'), _('Look for the current artist on Myspace'), "")
+    artist_myspace_action = Gtk.Action ('artist_myspace', _(ARTIST_LABELS[7]), _('Look for the current artist on Myspace'), "")
     artist_myspace_action.connect ('activate', self.search_on_myspace, shell) #No need to specify what to search
     action_group.add_action(artist_myspace_action)
     #0.3.9 Artist -> Torrentz
-    artist_torrentz_action = Gtk.Action ('artist_torrentz', _('Torrentz'), _('Look for the current artist on Torrentz'), "")
+    artist_torrentz_action = Gtk.Action ('artist_torrentz', _(ARTIST_LABELS[8]), _('Look for the current artist on Torrentz'), "")
     artist_torrentz_action.connect ('activate', self.search_on_torrentz, shell) #No need to specify what to search
     action_group.add_action_with_accel (artist_torrentz_action, "<alt>T")
     #0.3.10 Artist -> Every Service
-    artist_all_action = Gtk.Action ('artist_all', _('All'), _('Look for the current artist on every service'), "")
+    artist_all_action = Gtk.Action ('artist_all', _(ARTIST_LABELS[9]), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, settings, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_all_action)
     ui_manager = shell.props.ui_manager
@@ -248,79 +255,83 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     youtube_action.connect ('activate', self.search_on_youtube, shell, True) #"True" says that the command is launched from the context menu
     action_group.add_action_with_accel (youtube_action, "<alt>Y")
     #0.2.1 Album -> Wikipedia
-    album_wikipedia_action = Gtk.Action ('album_wikipedia_cx', _('Wikipedia'), _('Look for the current album on Wikipedia'), "")
+    album_wikipedia_action = Gtk.Action ('album_wikipedia_cx', _(ALBUM_LABELS[0]), _('Look for the current album on Wikipedia'), "")
     album_wikipedia_action.connect ('activate', self.search_on_wikipedia, shell, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu
     action_group.add_action_with_accel (album_wikipedia_action, "<alt>W")
     #0.2.2 Album -> AllMusic
-    album_allmusic_action = Gtk.Action ('album_allmusic_cx', _('AllMusic'), _('Look for the current album on AllMusic'), "")
+    album_allmusic_action = Gtk.Action ('album_allmusic_cx', _(ALBUM_LABELS[1]), _('Look for the current album on AllMusic'), "")
     album_allmusic_action.connect ('activate', self.search_on_allmusic, shell, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu
     action_group.add_action(album_allmusic_action)
     #0.2.3 Album -> RateYourMusic
-    album_rateyourmusic_action = Gtk.Action ('album_rateyourmusic_cx', _('RateYourMusic'), _('Look for the current album on RateYourMusic'), "")
+    album_rateyourmusic_action = Gtk.Action ('album_rateyourmusic_cx', _(ALBUM_LABELS[2]), _('Look for the current album on RateYourMusic'), "")
     album_rateyourmusic_action.connect ('activate', self.search_on_rateyourmusic, shell, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu
     action_group.add_action(album_rateyourmusic_action)
     #0.2.4 Album -> AllAboutJazz
-    album_allaboutjazz_action = Gtk.Action ('album_allaboutjazz_cx', _('AllAboutJazz'), _('Look for the current album on AllAboutJazz'), "")
+    album_allaboutjazz_action = Gtk.Action ('album_allaboutjazz_cx', _(ALBUM_LABELS[3]), _('Look for the current album on AllAboutJazz'), "")
     album_allaboutjazz_action.connect ('activate', self.search_on_allaboutjazz, shell, True)  #No need to specify what to search, "True" says that the command is launched from the context menu"
     action_group.add_action(album_allaboutjazz_action)
     #0.2.5 Album -> DiscoGS
-    album_discogs_action = Gtk.Action ('album_discogs_cx', _('DiscoGS'), _('Look for the current album on DiscoGS'), "")
+    album_discogs_action = Gtk.Action ('album_discogs_cx', _(ALBUM_LABELS[4]), _('Look for the current album on DiscoGS'), "")
     album_discogs_action.connect ('activate', self.search_on_discogs, shell, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu
     action_group.add_action(album_discogs_action)
     #0.2.6 Album -> Lastfm
-    album_lastfm_action = Gtk.Action ('album_lastfm_cx', _('Last.fm'), _('Look for the current album on Last.fm'), "")
+    album_lastfm_action = Gtk.Action ('album_lastfm_cx', _(ALBUM_LABELS[5]), _('Look for the current album on Last.fm'), "")
     album_lastfm_action.connect ('activate', self.search_on_lastfm, shell, 1, True) #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu
     action_group.add_action(album_lastfm_action)
-    #0.2.7 Album -> Facebook
-    album_facebook_action = Gtk.Action ('album_facebook_cx', _('Facebook'), _('Look for the current album on Facebook'), "")
+    #0.2.7 Album -> Grooveshark
+    album_grooveshark_action = Gtk.Action ('album_grooveshark_cx', _(ALBUM_LABELS[6]), _('Look for the current album on Grooveshark'), "")
+    album_grooveshark_action.connect ('activate', self.search_on_grooveshark, shell, True) #No need to specify what to search, "True" says that the command is launched from the context menu"
+    action_group.add_action(album_grooveshark_action)
+    #0.2.8 Album -> Facebook
+    album_facebook_action = Gtk.Action ('album_facebook_cx', _(ALBUM_LABELS[7]), _('Look for the current album on Facebook'), "")
     album_facebook_action.connect ('activate', self.search_on_facebook, shell, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu
     action_group.add_action(album_facebook_action)
-    #0.2.8 Album -> Amazon
-    album_amazon_action = Gtk.Action ('album_amazon_cx', _('Amazon'), _('Look for the current album on Amazon'), "")
+    #0.2.9 Album -> Amazon
+    album_amazon_action = Gtk.Action ('album_amazon_cx', _(ALBUM_LABELS[8]), _('Look for the current album on Amazon'), "")
     album_amazon_action.connect ('activate', self.search_on_amazon, shell, True) #No need to specify what to search, "True" says that the command is launched from the context menu"
     action_group.add_action(album_amazon_action)
-    #0.2.9 Album -> Every Service
-    album_all_action = Gtk.Action ('album_all_cx', _('All'), _('Look for the current album on every service'), "")
+    #0.2.10 Album -> Every Service
+    album_all_action = Gtk.Action ('album_all_cx', _(ALBUM_LABELS[9]), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, settings, 1, True)  #The last arguments: "1" stands for "Album", "True" says that the command is launched from the context menu"
     action_group.add_action(album_all_action)
     #0.3.1 Artist -> Wikipedia
-    artist_wikipedia_action = Gtk.Action ('artist_wikipedia_cx', _('Wikipedia'), _('Look for the current artist on Wikipedia'), "")
+    artist_wikipedia_action = Gtk.Action ('artist_wikipedia_cx', _(ARTIST_LABELS[0]), _('Look for the current artist on Wikipedia'), "")
     artist_wikipedia_action.connect ('activate', self.search_on_wikipedia, shell, 2, True)  #The last argument "2" stands for "Artist", "True" says that the command is launched from the context menu"
     action_group.add_action(artist_wikipedia_action)
     #0.3.2 Artist -> AllMusic
-    artist_allmusic_action = Gtk.Action ('artist_allmusic_cx', _('AllMusic'), _('Look for the current artist on AllMusic'), "")
+    artist_allmusic_action = Gtk.Action ('artist_allmusic_cx', _(ARTIST_LABELS[1]), _('Look for the current artist on AllMusic'), "")
     artist_allmusic_action.connect ('activate', self.search_on_allmusic, shell, 2, True) #The last argument "2" stands for "Artist", "True" says that the command is launched from the context menu"
     action_group.add_action_with_accel (artist_allmusic_action, "<alt>A")
     #0.3.3 Artist -> RateYourMusic
-    artsit_rateyourmusic_action = Gtk.Action ('artist_rateyourmusic_cx', _('RateYourMusic'), _('Look for the current artsit on RateYourMusic'), "")
+    artsit_rateyourmusic_action = Gtk.Action ('artist_rateyourmusic_cx', _(ARTIST_LABELS[2]), _('Look for the current artsit on RateYourMusic'), "")
     artsit_rateyourmusic_action.connect ('activate', self.search_on_rateyourmusic, shell, 2, True) #The last argument "2" stands for "Artist", "True" says that the command is launched from the context menu"
     action_group.add_action(artsit_rateyourmusic_action)
     #0.3.4 Artist -> DiscoGS
-    artist_discogs_action = Gtk.Action ('artist_discogs_cx', _('DiscoGS'), _('Look for the current artist on DiscoGS'), "")
+    artist_discogs_action = Gtk.Action ('artist_discogs_cx', _(ARTIST_LABELS[3]), _('Look for the current artist on DiscoGS'), "")
     artist_discogs_action.connect ('activate', self.search_on_discogs, shell, 2, True) #The last argument "2" stands for "Artist", "True" says that the command is launched from the context menu"
     action_group.add_action(artist_discogs_action)
     #0.3.5 Artist -> Official Website
-    artist_official_action = Gtk.Action ('artist_official_cx', _('Official Website'), _('Look for the current artist\'s official website'), "")
+    artist_official_action = Gtk.Action ('artist_official_cx', _(ARTIST_LABELS[4]), _('Look for the current artist\'s official website'), "")
     artist_official_action.connect ('activate', self.search_on_official, shell, True) #No need to specify what to search, "True" says that the command is launched from the context menu"
     action_group.add_action(artist_official_action)
     #0.3.6 Artist -> Lastfm
-    artsit_lastfm_action = Gtk.Action ('artist_lastfm_cx', _('Last.fm'), _('Look for the current artsit on Last.fm'), "")
+    artsit_lastfm_action = Gtk.Action ('artist_lastfm_cx', _(ARTIST_LABELS[5]), _('Look for the current artsit on Last.fm'), "")
     artsit_lastfm_action.connect ('activate', self.search_on_lastfm, shell, 2, True) #The last argument "2" stands for "Artist"
     action_group.add_action(artsit_lastfm_action)
     #0.3.7 Artist -> Facebook
-    artist_facebook_action = Gtk.Action ('artist_facebook_cx', _('Facebook'), _('Look for the current artist on Facebook'), "")
+    artist_facebook_action = Gtk.Action ('artist_facebook_cx', _(ARTIST_LABELS[6]), _('Look for the current artist on Facebook'), "")
     artist_facebook_action.connect ('activate', self.search_on_facebook, shell, 2, True) #The last argument "2" stands for "Artist", "True" says that the command is launched from the context menu"
     action_group.add_action(artist_facebook_action)
     #0.3.8 Artist -> Myspace
-    artist_myspace_action = Gtk.Action ('artist_myspace_cx', _('Myspace'), _('Look for the current artist on Myspace'), "")
+    artist_myspace_action = Gtk.Action ('artist_myspace_cx', _(ARTIST_LABELS[7]), _('Look for the current artist on Myspace'), "")
     artist_myspace_action.connect ('activate', self.search_on_myspace, shell, True) #No need to specify what to search, "True" says that the command is launched from the context menu"
     action_group.add_action(artist_myspace_action)
     #0.3.9 Artist -> Torrentz
-    artist_torrentz_action = Gtk.Action ('artist_torrentz_cx', _('Torrentz'), _('Look for the current artist on Torrentz'), "")
+    artist_torrentz_action = Gtk.Action ('artist_torrentz_cx', _(ARTIST_LABELS[8]), _('Look for the current artist on Torrentz'), "")
     artist_torrentz_action.connect ('activate', self.search_on_torrentz, shell, True) #No need to specify what to search, "True" says that the command is launched from the context menu"
     action_group.add_action_with_accel (artist_torrentz_action, "<alt>T")
     #0.3.10 Artist -> Every Service
-    artist_all_action = Gtk.Action ('artist_all_cx', _('All'), _('Look for the current artist on every service'), "")
+    artist_all_action = Gtk.Action ('artist_all_cx', _(ARTIST_LABELS[9]), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, settings, 2, True) #The last argument "2" stands for "Artist", "True" says that the command is launched from the context menu"
     action_group.add_action(artist_all_action)
     ui_manager = shell.props.ui_manager
@@ -469,6 +480,14 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     os.system(command)
 
 ##########
+#The "search_on_grooveshark" function search ALBUM + ARTIST on Grooveshark
+##########
+  def search_on_grooveshark(self, event, shell, context=False):
+    metadata=self.get_metadata(shell, context) #Calls "get_metadata"
+    command="gnome-open \"http://grooveshark.com/#!/search/album?q="  + urllib2.quote(metadata[2]) + " " + urllib2.quote(metadata[1]) +  "\""  #you're looking for the album but the artist is added to get better results
+    os.system(command)
+
+##########
 #The "search_on_facebook" function search the artist OR the album on facebook; "what" argument: 0=title (not used), 1=album, 2=artist
 ##########
   def search_on_facebook(self, event, shell, what, context=False):
@@ -489,7 +508,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
   def search_on_amazon(self, event, shell, context=False):
     metadata=self.get_metadata(shell, context) #Calls "get_metadata"
-    command="gnome-open \"http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Dpopular&field-keywords=" + urllib2.quote(metadata[2]) + " " + urllib2.quote(metadata[1]) + "\""
+    command="gnome-open \"http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Dpopular&field-keywords=" + urllib2.quote(metadata[2]) + " " + urllib2.quote(metadata[1]) + "\""  #you're looking for the album but the artist is added to get better results
     os.system(command)
 
 ##########
@@ -513,6 +532,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     if 'discogs' in settings[what_in_letters[what-1]]: self.search_on_discogs('activate', shell, what, context)
     if 'official' in settings[what_in_letters[what-1]]: self.search_on_official('activate', shell, context)
     if 'lastfm' in settings[what_in_letters[what-1]]: self.search_on_facebook('activate', shell, what, context)
+    if 'grooveshark' in settings[what_in_letters[what-1]]: self.search_on_grooveshark('activate', shell, context)
     if 'facebook' in settings[what_in_letters[what-1]]: self.search_on_lastfm('activate', shell, what, context)
     if 'myspace' in settings[what_in_letters[what-1]]: self.search_on_myspace('activate', shell, context)
     if 'amazon' in settings[what_in_letters[what-1]]:  self.search_on_amazon('activate', shell, context)

@@ -3,7 +3,7 @@
   <schema id="org.gnome.rhythmbox.plugins.webmenu" path="/org/gnome/rhythmbox/plugins/webmenu/">
 
     <key type="as" name="default-album-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'allaboutjazz', 'discogs', 'lastfm', 'facebook', 'amazon', 'all']</default>
+      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'allaboutjazz', 'discogs', 'lastfm', 'grooveshark', 'facebook', 'amazon', 'all']</default>
       <summary>Album menu</summary>
       <description>Do NOT change this.</description>
     </key>
@@ -11,7 +11,7 @@
     <key type="as" name="active-album-services">
       <default>['wikipedia', 'allmusic', 'rateyourmusic', 'facebook', 'amazon', 'all']</default>
       <summary>Album menu</summary>
-      <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'allaboutjazz', 'discogs', 'lastfm', 'facebook', 'amazon', 'all'</description>
+      <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'allaboutjazz', 'discogs', 'lastfm', 'grooveshark', 'facebook', 'amazon', 'all'</description>
     </key>
 
     <key type="as" name="default-artist-services">
