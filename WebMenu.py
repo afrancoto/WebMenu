@@ -14,17 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#To add a new service:
-#0. Decide a position for the service in the menu and keep it for every next step
-#1. Add the "web_menu_item" and the "web_context_part" entries: the menu name must be AL_servicename/AR_servicename, the action album_servicename/artist_servicename and album_servicename_cx/artist_servicename_cx
-#2. Add actions (album and/or artist) in "draw_menu" and "draw_context_menu" (update position numbers!)
-#3. Add service name (lowercase) to "org.gnome.rhythmbox.plugins.webmenu.gschema.xml" in "default-*-services" <default> and in "active-*-services" <description>  (order is important)
-#4. Add an entry in "ALBUM_LABELS" and "ARTIST_LABELS" in WebMenu_config.py (order is important)
-#4. Add the search_on_service function
-#5. Add the entry in "search_on_all" function
-#6. Launch Rhythmbox, enable the service in WebMenu preferences and test it from both the menubar and the context menu
-#7. Add the service name in WebMenu.plugin and README.md
-
 from gi.repository import GObject, RB, Peas, Gtk
 import webbrowser
 import urllib2
