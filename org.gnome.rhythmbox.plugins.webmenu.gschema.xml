@@ -26,5 +26,13 @@
       <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'official', 'lastfm', 'facebook', 'myspace', 'torrentz', 'all'</description>
     </key>
 
+<key type="a{s(sssbb)}" name="services">
+      <default>{'Wikipedia':('', 'http://en.wikipedia.org/w/index.php?search=[ALBUM]', 'http://en.wikipedia.org/w/index.php?search=[ARTIST]', true, true), 
+	        'AllMusic':('', 'http://www.allmusic.com/search/album/[ALBUM]+[ARTIST]', 'http://www.allmusic.com/search/artist/[ARTIST]', true, false),
+	        'RateYourMusic':('', 'http://rateyourmusic.com/search?searchterm=[ALBUM]&amp;searchtype=l', 'http://rateyourmusic.com/search?searchterm=[ARTIST]&amp;searchtype=a', false, true)}</default>
+    <summary>Music Services</summary>
+    <description>Services with their respectives urls for song, album and artist search</description>
+</key>
+
   </schema>
 </schemalist>
