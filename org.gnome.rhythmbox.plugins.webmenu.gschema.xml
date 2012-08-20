@@ -1,38 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
   <schema id="org.gnome.rhythmbox.plugins.webmenu" path="/org/gnome/rhythmbox/plugins/webmenu/">
-
-    <key type="as" name="default-album-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'allaboutjazz', 'discogs', 'lastfm', 'grooveshark', 'facebook', 'amazon', 'all']</default>
-      <summary>Album menu</summary>
-      <description>Do NOT change this.</description>
-    </key>
-
-    <key type="as" name="active-album-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'facebook', 'amazon', 'all']</default>
-      <summary>Album menu</summary>
-      <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'allaboutjazz', 'discogs', 'lastfm', 'grooveshark', 'facebook', 'amazon', 'all'</description>
-    </key>
-
-    <key type="as" name="default-artist-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'official', 'lastfm', 'facebook', 'myspace', 'torrentz', 'all']</default>
-      <summary>Artist menu</summary>
-      <description>Do NOT change this.</description>
-    </key>
-
-    <key type="as" name="active-artist-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'facebook', 'myspace', 'torrentz', 'all']</default>
-      <summary>Artist menu</summary>
-      <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'official', 'lastfm', 'facebook', 'myspace', 'torrentz', 'all'</description>
-    </key>
-
-<key type="a{s(sssbb)}" name="services">
-      <default>{'Wikipedia':('', 'http://en.wikipedia.org/w/index.php?search=[ALBUM]', 'http://en.wikipedia.org/w/index.php?search=[ARTIST]', true, true), 
-	        'AllMusic':('', 'http://www.allmusic.com/search/album/[ALBUM]+[ARTIST]', 'http://www.allmusic.com/search/artist/[ARTIST]', true, false),
-	        'RateYourMusic':('', 'http://rateyourmusic.com/search?searchterm=[ALBUM]&amp;searchtype=l', 'http://rateyourmusic.com/search?searchterm=[ARTIST]&amp;searchtype=a', false, true)}</default>
-    <summary>Music Services</summary>
-    <description>Services with their respectives urls for song, album and artist search</description>
-</key>
-
+	<key type="a{s(sssbb)}" name="services">
+     	 <default>{'Wikipedia':('', 'http://en.wikipedia.org/w/index.php?search=[ALBUM]', 'http://en.wikipedia.org/w/index.php?search=[ARTIST]', true, true), 
+	           'AllMusic':('', 'http://www.allmusic.com/search/album/[ALBUM]+[ARTIST]', 'http://www.allmusic.com/search/artist/[ARTIST]', true, false),
+	           'RateYourMusic':('', 'http://rateyourmusic.com/search?searchterm=[ALBUM]&amp;searchtype=l', 'http://rateyourmusic.com/search?searchterm=[ARTIST]&amp;searchtype=a', false, true),
+		   'AllAboutJazz':('','http://www.allaboutjazz.com/googlesearch.php?cx=005595936876858408448%3Ahfhqnzuknl8&amp;cof=FORID%3A11&amp;q=[ALBUM]+[ARTIST]','', true, true)
+}</default>
+    	<summary>Music Services</summary>
+    	<description>Services with their respectives urls for song, album and artist search</description>
+	</key>
   </schema>
 </schemalist>

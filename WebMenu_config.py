@@ -53,11 +53,12 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         albumvbox.set_margin_left(15)
 	albumvbox.set_margin_right(15)
         for service, data in services.items():
-            check = Gtk.CheckButton(service)
-            check.set_active(services[service][3])
-            check.connect("toggled", self.website_toggled, service, 1)#The last argument, 1, stands for "Album"   
-            albumvbox.pack_start(check, False, False, 0)
-        
+	    if services[service][1] is not '': #If the album URL is empty does not display the option
+		    check = Gtk.CheckButton(service)
+		    check.set_active(services[service][3])
+		    check.connect("toggled", self.website_toggled, service, 1)#The last argument, 1, stands for "Album"   
+		    albumvbox.pack_start(check, False, False, 0)
+		
         hbox.pack_start(albumvbox, False, False, 0)
 
 	artistlabel = Gtk.Label("<b>Artist Submenu:</b>", use_markup=True) #Frome here: 'Artist' vertical box      
@@ -66,10 +67,11 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         artistvbox.set_margin_left(15)
 	artistvbox.set_margin_right(15)
         for service, data in services.items():
-            check = Gtk.CheckButton(service)
-            check.set_active(services[service][4])
-            check.connect("toggled", self.website_toggled, service, 2)#The last argument, 2, stands for "Artist"   
-            artistvbox.pack_start(check, False, False, 0)
+	    if services[service][2] is not '': #If the artist URL is empty does not display the option
+		    check = Gtk.CheckButton(service)
+		    check.set_active(services[service][4])
+		    check.connect("toggled", self.website_toggled, service, 2)#The last argument, 2, stands for "Artist"   
+		    artistvbox.pack_start(check, False, False, 0)
        
         hbox.pack_start(artistvbox, False, False, 0)
 	vbox.pack_start(hbox, False, False, 0)
@@ -85,7 +87,12 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
     
        
     def website_toggled(self, checkbutton, service, what):
-	services[service][what+2]=checkbutton.get_active()
+	data = list(services[service])
+	data[what+2] = checkbutton.get_active()
+	services[service]= tuple(data)
+
+	#after asigning the new data, you should persist the services
+	self.settings['services'] = services
 
     def update_search(self, widget, data=None):
     	webbrowser.open("https://github.com/afrancoto/WebMenu/downloads")

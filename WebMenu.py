@@ -15,7 +15,7 @@
 
 
 from gi.repository import GObject, RB, Peas, Gtk
-import webbrowser
+import webbrowser, os
 import urllib2
 
 from WebMenu_config import WMConfig
@@ -88,13 +88,14 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     #0.2.X Album SubMenu Items
     ui_album=''
     for service, data in services.items():
- 	#Add a new submenu item	
-        action_name = 'album_%s' % service
-        ui_album = '<menuitem name="AL_%s" action="%s"/>' % (service, action_name) + ui_album #ui_album is the Album submenu
-        #Create the action
-        action = Gtk.Action( action_name, service, _('Look for the current album on %s' % service), '' )
-        action.connect( 'activate', self.unique_search_function, shell, 1, service)
-        action_group.add_action( action )
+	if services[service][1] is not '':
+ 		#Add a new submenu item	
+        	action_name = 'album_%s' % service
+        	ui_album = '<menuitem name="AL_%s" action="%s"/>' % (service, action_name) + ui_album #ui_album is the Album submenu
+        	#Create the action
+        	action = Gtk.Action( action_name, service, _('Look for the current album on %s' % service), '' )
+        	action.connect( 'activate', self.unique_search_function, shell, 1, service)
+        	action_group.add_action( action )
 
     #0.2.n Album -> Every Service
     album_all_action = Gtk.Action ('album_all', _('All'), _('Look for the current album on every service'), "")
@@ -107,13 +108,14 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     #0.3.X Artist SubMenu Items 
     ui_artist=''
     for service, data in services.items():
- 	#Add a new submenu item	
-        action_name = 'artist_%s' % service
-        ui_artist = '<menuitem name="AR_%s" action="%s"/>' % (service, action_name) + ui_artist #ui_artist is the Artist submenu
-        #Create the action
-        action = Gtk.Action( action_name, service, _('Look for the current artist on %s' % service), '' )
-        action.connect( 'activate', self.unique_search_function, shell, 2, service)
-        action_group.add_action( action )
+	if services[service][2] is not '':
+ 		#Add a new submenu item	
+        	action_name = 'artist_%s' % service
+        	ui_artist = '<menuitem name="AR_%s" action="%s"/>' % (service, action_name) + ui_artist #ui_artist is the Artist submenu
+        	#Create the action
+        	action = Gtk.Action( action_name, service, _('Look for the current artist on %s' % service), '' )
+        	action.connect( 'activate', self.unique_search_function, shell, 2, service)
+	        action_group.add_action( action )
 
     #0.3.n Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all', _('All'), _('Look for the current artist on every service'), "")
@@ -140,13 +142,14 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     #0.2.X Album SubMenu
     ui_album=''
     for service, data in services.items():
- 	#Add a new submenu item	
-        action_name = 'album_%s_cx' % service
-        ui_album = '<menuitem name="AL_%s" action="%s"/>' % (service, action_name) + ui_album #ui_album is the Album submenu
-        #Create the action
-        action = Gtk.Action( action_name, service, _('Look for the selected album on %s' % service), '' )
-        action.connect( 'activate', self.unique_search_function, shell, 1, service, True )
-        action_group.add_action( action )
+	if services[service][1] is not '':
+ 		#Add a new submenu item	
+        	action_name = 'album_%s_cx' % service
+        	ui_album = '<menuitem name="AL_%s" action="%s"/>' % (service, action_name) + ui_album #ui_album is the Album submenu
+	        #Create the action
+       		action = Gtk.Action( action_name, service, _('Look for the selected album on %s' % service), '' )
+        	action.connect( 'activate', self.unique_search_function, shell, 1, service, True )
+        	action_group.add_action( action )
     #0.2.n Album -> Every Service
     album_all_action = Gtk.Action ('album_all_cx', _('All'), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, 1, True) #The last argument "1" stands for "Album"
@@ -155,13 +158,14 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     #0.3.X Artist SubMenu
     ui_artist=''
     for service, data in services.items():
- 	#Add a new submenu item	
-        action_name = 'artist_%s_cx' % service
-        ui_artist = '<menuitem name="AR_%s" action="%s"/>' % (service, action_name) + ui_artist #ui_artist is the Artist submenu
-        #Create the action
-        action = Gtk.Action( action_name, service, _('Look for the selected artist on %s' % service), '' )
-        action.connect( 'activate', self.unique_search_function, shell, 2, service, True )
-        action_group.add_action( action )
+	if services[service][2] is not '':
+ 		#Add a new submenu item	
+        	action_name = 'artist_%s_cx' % service
+        	ui_artist = '<menuitem name="AR_%s" action="%s"/>' % (service, action_name) + ui_artist #ui_artist is the Artist submenu
+        	#Create the action
+       		action = Gtk.Action( action_name, service, _('Look for the selected artist on %s' % service), '' )
+        	action.connect( 'activate', self.unique_search_function, shell, 2, service, True )
+       		action_group.add_action( action )
     #0.3.n Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all_cx', _('All'), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, 2, True) #The last argument "2" stands for "Artist"
@@ -176,17 +180,21 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
 #The "apply_settings" function is called when Rhythmbox is loaded and whenever the settings are changed
 ##########
-  def apply_settings(self, settings, key, shell): 
+  def apply_settings(self, settings, key, shell):
+    services = self.settings['services']
+    #os.system("echo apply_settings:"+ settings)
     paths=["/MenuBar/WebMenu", "/QueuePlaylistViewPopup/PluginPlaceholder", "/BrowserSourceViewPopup/PluginPlaceholder", "/PlaylistViewPopup/PluginPlaceholder", "/PodcastViewPopup/PluginPlaceholder"] #Settings must be applied to the Web Menu and to every context menu
     for path in paths:
      for service, data in services.items():
 	menu_option=path+"/AlbumMenu/AL_"+service  #Hides the non-active options in the "Album" submenu
-	if services[service][3]: shell.props.ui_manager.get_widget(menu_option).show()
-	else: shell.props.ui_manager.get_widget(menu_option).hide()
+	if services[service][1] is not '':
+		if services[service][3]: shell.props.ui_manager.get_widget(menu_option).show()
+		else: shell.props.ui_manager.get_widget(menu_option).hide()
 
 	menu_option=path+"/ArtistMenu/AR_"+service  #Hides the non-active options in the "Artist" submenu
-	if services[service][4]: shell.props.ui_manager.get_widget(menu_option).show()
-	else: shell.props.ui_manager.get_widget(menu_option).hide()
+	if services[service][2] is not '':
+		if services[service][4]: shell.props.ui_manager.get_widget(menu_option).show()
+		else: shell.props.ui_manager.get_widget(menu_option).hide()
 
 ##########
 #The "do_activate" function is called when Rhythmbox is loaded
@@ -205,7 +213,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     self.draw_context_menu(shell) #Calls "draw_context_menu"
 
     self.apply_settings('oldsettings', None , shell) #Calls "apply_settings"
-    self.settings.connect('changed', self.apply_settings, shell, config) #Connects a change in the settings menus to "apply_settings"
+    self.settings.connect('changed', self.apply_settings, shell) #Connects a change in the settings menus to "apply_settings"
 
     sp=shell.props.shell_player #Connects play/stop events to "song_changed")
     sp.connect ('playing-changed', self.song_changed, shell.props)
@@ -284,9 +292,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     s_props.ui_manager.get_widget("/MenuBar/WebMenu/YTitem").set_sensitive(now_is_playing)  #Disable the YouTube item
     for service, data in services.items():
-        menu_option="/MenuBar/WebMenu/AlbumMenu/AL_"+service  #Disable all the options in the "Album" submenu
-        s_props.ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
-        menu_option="/MenuBar/WebMenu/ArtistMenu/AR_"+service #Disable all the options in the "Artist" submenu
-        s_props.ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
+	if services[service][1] is not '':
+		menu_option="/MenuBar/WebMenu/AlbumMenu/AL_"+service  #Disable all the options in the "Album" submenu
+		s_props.ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
+	if services[service][2] is not '':
+		menu_option="/MenuBar/WebMenu/ArtistMenu/AR_"+service #Disable all the options in the "Artist" submenu
+		s_props.ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
     s_props.ui_manager.get_widget("/MenuBar/WebMenu/AlbumMenu/AL_All").set_sensitive(now_is_playing)  #Disable the Album/All item
     s_props.ui_manager.get_widget("/MenuBar/WebMenu/ArtistMenu/AR_All").set_sensitive(now_is_playing)  #Disable the Artist/All item
