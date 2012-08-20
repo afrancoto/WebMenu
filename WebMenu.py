@@ -26,12 +26,11 @@
 #7. Add the service name in WebMenu.plugin and README.md
 
 from gi.repository import GObject, RB, Peas, Gtk
-import os, webbrowser
+import webbrowser
 import urllib2
 
 from WebMenu_config import WMConfig
 from WebMenu_config import WMConfigDialog
-from WebMenu_config import ALBUM_LABELS, ARTIST_LABELS
 
 services = {}
 web_menu_item = '''
@@ -260,8 +259,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
   def search_on_youtube(self, event, shell, context=False):
     metadata=self.get_metadata(shell, context) #Calls "get_metadata"
-    command="gnome-open http://www.youtube.com/results?search_query=\"" + urllib2.quote(metadata[0]) + "\"+\"" + urllib2.quote(metadata[2]) + "\""
-    os.system(command)
+    final_url="http://www.youtube.com/results?search_query=\"" + urllib2.quote(metadata[0]) + "\"+\"" + urllib2.quote(metadata[2]) + "\""
+    webbrowser.open(final_url)
 
 ##########
 #The "unique_search_function" is the one which is called by the menu/context menu actions

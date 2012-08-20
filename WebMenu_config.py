@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import webbrowser
 
 from gi.repository import Gio
 from gi.repository import GObject
@@ -23,11 +23,8 @@ from gi.repository import RB
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.webmenu'
 CURRENT_VERSION = '1.0'
-ALBUM_LABELS = ['Wikipedia', 'AllMusic', 'RateYourMusic', 'AllAboutJazz', 'DiscoGS', 'Last.fm', 'Grooveshark', 'Facebook', 'Amazon.com', 'All']
-ARTIST_LABELS = ['Wikipedia', 'AllMusic', 'RateYourMusic', 'DiscoGS', 'Official Website [beta]', 'Last.fm', 'Facebook', 'MySpace', 'Torrentz', 'All']
 
 class WMConfig(object):
-    
     def __init__(self):
         self.settings = Gio.Settings(DCONF_DIR)
 
@@ -43,6 +40,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         self.settings = Gio.Settings(DCONF_DIR)
 
     def do_create_configure_widget(self):
+	global services
         dialog = Gtk.VBox()
     	
 	vbox=Gtk.VBox(False, 15)
@@ -53,10 +51,10 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	albumvbox.pack_start(albumlabel, False, False, 10)
         albumvbox.set_margin_left(15)
 	albumvbox.set_margin_right(15)
-        for website in self.settings["default-album-services"]:
-            check = Gtk.CheckButton(ALBUM_LABELS[self.settings["default-album-services"].index(website)])
-            check.set_active(website in self.settings["active-album-services"])
-            check.connect("toggled", self.website_toggled, website, "active-album-services")    
+        for service, data in services.items():
+            check = Gtk.CheckButton(service)
+            check.set_active(services[service][3])
+            check.connect("toggled", self.website_toggled, service, 1)#The last argument, 1, stands for "Album"   
             albumvbox.pack_start(check, False, False, 0)
         
         hbox.pack_start(albumvbox, False, False, 0)
@@ -66,11 +64,11 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	artistvbox.pack_start(artistlabel, False, False, 10)
         artistvbox.set_margin_left(15)
 	artistvbox.set_margin_right(15)
-        for website in self.settings["default-artist-services"]:
-            check = Gtk.CheckButton(ARTIST_LABELS[self.settings["default-artist-services"].index(website)])
-            check.set_active(website in self.settings["active-artist-services"])
-            check.connect("toggled", self.website_toggled, website, "active-artist-services")    
-            artistvbox.pack_start(check, True, True, 0)
+        for service, data in services.items():
+            check = Gtk.CheckButton(service)
+            check.set_active(services[service][4])
+            check.connect("toggled", self.website_toggled, service, 2)#The last argument, 2, stands for "Artist"   
+            albumvbox.pack_start(check, False, False, 0)
        
         hbox.pack_start(artistvbox, False, False, 0)
 	vbox.pack_start(hbox, False, False, 0)
@@ -85,14 +83,8 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         return dialog
     
        
-    def website_toggled(self, checkbutton, website, key):
-        entries = self.settings[key]
-        if checkbutton.get_active():
-            entries.append(website)
-        else:
-            entries.remove(website)
-            
-        self.settings[key] = entries
+    def website_toggled(self, checkbutton, service, what):
+	services[service][what+2]=checkbutton.get_active()
 
     def update_search(self, widget, data=None):
-	os.system("gnome-open https://github.com/afrancoto/WebMenu/downloads")
+    	webbrowser.open("https://github.com/afrancoto/WebMenu/downloads")
