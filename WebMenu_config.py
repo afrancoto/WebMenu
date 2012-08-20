@@ -26,7 +26,9 @@ CURRENT_VERSION = '1.0'
 
 class WMConfig(object):
     def __init__(self):
+	global services
         self.settings = Gio.Settings(DCONF_DIR)
+	services = self.settings['services'] #'services' is a global variable with all the settings in it
 
     def get_settings(self):
         return self.settings
@@ -40,7 +42,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         self.settings = Gio.Settings(DCONF_DIR)
 
     def do_create_configure_widget(self):
-	global services
         dialog = Gtk.VBox()
     	
 	vbox=Gtk.VBox(False, 15)
@@ -68,7 +69,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
             check = Gtk.CheckButton(service)
             check.set_active(services[service][4])
             check.connect("toggled", self.website_toggled, service, 2)#The last argument, 2, stands for "Artist"   
-            albumvbox.pack_start(check, False, False, 0)
+            artistvbox.pack_start(check, False, False, 0)
        
         hbox.pack_start(artistvbox, False, False, 0)
 	vbox.pack_start(hbox, False, False, 0)
