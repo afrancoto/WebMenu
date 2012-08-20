@@ -5,8 +5,16 @@
      	 <default>{'Wikipedia':('', 'http://en.wikipedia.org/w/index.php?search=[ALBUM]', 'http://en.wikipedia.org/w/index.php?search=[ARTIST]', true, true), 
 	           'AllMusic':('', 'http://www.allmusic.com/search/album/[ALBUM]+[ARTIST]', 'http://www.allmusic.com/search/artist/[ARTIST]', true, false),
 	           'RateYourMusic':('', 'http://rateyourmusic.com/search?searchterm=[ALBUM]&amp;searchtype=l', 'http://rateyourmusic.com/search?searchterm=[ARTIST]&amp;searchtype=a', false, true),
-		   'AllAboutJazz':('','http://www.allaboutjazz.com/googlesearch.php?cx=005595936876858408448%3Ahfhqnzuknl8&amp;cof=FORID%3A11&amp;q=[ALBUM]+[ARTIST]','', true, true)
-}</default>
+		   'AllAboutJazz':('','http://www.allaboutjazz.com/googlesearch.php?cx=005595936876858408448%3Ahfhqnzuknl8&amp;cof=FORID%3A11&amp;q=[ALBUM]+[ARTIST]','', true, false),
+		   'DiscoGS' :('','http://www.discogs.com/advanced_search?release_title=[ALBUM]&amp;artist=[ARTIST]','http://www.discogs.com/advanced_search?artist=[ARTIST]', false, false),
+		   'Official Website' :('','','http://www.google.com/search?btnI=I%27m+Feeling+Lucky&amp;q=[ARTIST]+official+website',false, false),
+		   'Last.fm' :('','http://www.last.fm/search?type=album&amp;q=[ALBUM]', 'http://www.last.fm/search?type=artist&amp;q=[ARTIST]', false, false),
+		   'Grooveshark' :('','http://grooveshark.com/#!/search/album?q=[ALBUM]+[ARTIST]','http://grooveshark.com/#!/search/artist?q=[ARTIST]', true, true),
+		   'Facebook' :('','https://www.facebook.com/search/results.php?type=pages&amp;q=[ALBUM]','https://www.facebook.com/search/results.php?type=pages&amp;q=[ARTIST]', false, true),
+		   'MySpace' :('','','http://www.myspace.com/search/Music?q=[ARTIST]', false, true),
+		   'Amazon.com' :('', 'http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Dpopular&amp;field-keywords=[ALBUM]+[ARTIST]','', true, false),
+		   'Torrentz' :('', 'http://torrentz.com/search?f=[ALBUM]+[ARTIST]', 'http://torrentz.com/search?f=[ARTIST]', false, true)
+	}</default>
     	<summary>Music Services</summary>
     	<description>Services with their respectives urls for song, album and artist search</description>
 	</key>

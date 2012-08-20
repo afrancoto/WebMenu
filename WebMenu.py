@@ -87,11 +87,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action(album_menu_action)
     #0.2.X Album SubMenu Items
     ui_album=''
-    for service, data in services.items():
+    for service, data in reversed(services.items()):
 	if services[service][1] is not '':
  		#Add a new submenu item	
         	action_name = 'album_%s' % service
-        	ui_album = '<menuitem name="AL_%s" action="%s"/>' % (service, action_name) + ui_album #ui_album is the Album submenu
+        	ui_album += '<menuitem name="AL_%s" action="%s"/>' % (service, action_name) #ui_album is the Album submenu
         	#Create the action
         	action = Gtk.Action( action_name, service, _('Look for the current album on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 1, service)
@@ -107,11 +107,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action(artist_menu_action)
     #0.3.X Artist SubMenu Items 
     ui_artist=''
-    for service, data in services.items():
+    for service, data in reversed(services.items()):
 	if services[service][2] is not '':
  		#Add a new submenu item	
         	action_name = 'artist_%s' % service
-        	ui_artist = '<menuitem name="AR_%s" action="%s"/>' % (service, action_name) + ui_artist #ui_artist is the Artist submenu
+        	ui_artist += '<menuitem name="AR_%s" action="%s"/>' % (service, action_name) #ui_artist is the Artist submenu
         	#Create the action
         	action = Gtk.Action( action_name, service, _('Look for the current artist on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 2, service)
@@ -141,11 +141,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action_with_accel (youtube_action, "<alt>Y")
     #0.2.X Album SubMenu
     ui_album=''
-    for service, data in services.items():
+    for service, data in reversed(services.items()):
 	if services[service][1] is not '':
  		#Add a new submenu item	
         	action_name = 'album_%s_cx' % service
-        	ui_album = '<menuitem name="AL_%s" action="%s"/>' % (service, action_name) + ui_album #ui_album is the Album submenu
+        	ui_album += '<menuitem name="AL_%s" action="%s"/>' % (service, action_name) #ui_album is the Album submenu
 	        #Create the action
        		action = Gtk.Action( action_name, service, _('Look for the selected album on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 1, service, True )
@@ -157,11 +157,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     #0.3.X Artist SubMenu
     ui_artist=''
-    for service, data in services.items():
+    for service, data in reversed(services.items()):
 	if services[service][2] is not '':
  		#Add a new submenu item	
         	action_name = 'artist_%s_cx' % service
-        	ui_artist = '<menuitem name="AR_%s" action="%s"/>' % (service, action_name) + ui_artist #ui_artist is the Artist submenu
+        	ui_artist += '<menuitem name="AR_%s" action="%s"/>' % (service, action_name) #ui_artist is the Artist submenu
         	#Create the action
        		action = Gtk.Action( action_name, service, _('Look for the selected artist on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 2, service, True )
@@ -280,8 +280,9 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "search_on_all" function search the artist OR the album on every service which is activ; "what" argument: 0=title (not used), 1=album, 2=artist
 ##########
   def search_on_all(self, event, shell, what, context=False):
-    for service, data in services.items(): 
-	if services[service][what+2]: self.unique_search_function('searchonall', shell, what, service, context)
+    for service, data in reversed(services.items()): 
+	if services[service][what+2] and (services[service][what] is not ''): 
+		self.unique_search_function('searchonall', shell, what, service, context)
 
 ##########
 #The "song_changed" function controls if no song is playing. If it is so, the 'Web' menu options are disabled.
