@@ -87,7 +87,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action(album_menu_action)
     #0.2.X Album SubMenu Items
     ui_album=''
-    for service, data in reversed(services.items()):
+    for service, data in services.items():
 	if services[service][1] is not '':
  		#Add a new submenu item	
         	action_name = 'album_%s' % service
@@ -107,7 +107,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action(artist_menu_action)
     #0.3.X Artist SubMenu Items 
     ui_artist=''
-    for service, data in reversed(services.items()):
+    for service, data in services.items():
 	if services[service][2] is not '':
  		#Add a new submenu item	
         	action_name = 'artist_%s' % service
@@ -141,7 +141,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action_with_accel (youtube_action, "<alt>Y")
     #0.2.X Album SubMenu
     ui_album=''
-    for service, data in reversed(services.items()):
+    for service, data in services.items():
 	if services[service][1] is not '':
  		#Add a new submenu item	
         	action_name = 'album_%s_cx' % service
@@ -157,7 +157,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     #0.3.X Artist SubMenu
     ui_artist=''
-    for service, data in reversed(services.items()):
+    for service, data in services.items():
 	if services[service][2] is not '':
  		#Add a new submenu item	
         	action_name = 'artist_%s_cx' % service
@@ -280,7 +280,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "search_on_all" function search the artist OR the album on every service which is activ; "what" argument: 0=title (not used), 1=album, 2=artist
 ##########
   def search_on_all(self, event, shell, what, context=False):
-    for service, data in reversed(services.items()): 
+    for service, data in services.items(): 
 	if services[service][what+2] and (services[service][what] is not ''): 
 		self.unique_search_function('searchonall', shell, what, service, context)
 

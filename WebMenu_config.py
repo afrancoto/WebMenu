@@ -52,7 +52,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	albumvbox.pack_start(albumlabel, False, False, 10)
         albumvbox.set_margin_left(15)
 	albumvbox.set_margin_right(15)
-        for service, data in reversed(services.items()):
+        for service, data in services.items():
 	    if services[service][1] is not '': #If the album URL is empty does not display the option
 		    check = Gtk.CheckButton(service)
 		    check.set_active(services[service][3])
@@ -66,7 +66,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	artistvbox.pack_start(artistlabel, False, False, 10)
         artistvbox.set_margin_left(15)
 	artistvbox.set_margin_right(15)
-        for service, data in reversed(services.items()):
+        for service, data in services.items():
 	    if services[service][2] is not '': #If the artist URL is empty does not display the option
 		    check = Gtk.CheckButton(service)
 		    check.set_active(services[service][4])
