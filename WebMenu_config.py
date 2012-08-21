@@ -182,12 +182,26 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	hbox.pack_start(vbox_entries, False, False, 0)	
 	vbox.pack_start(hbox, False, False, 10)
 
-	create_button = Gtk.Button("Add the service") #crea il pulsante
+	#create_button = Gtk.Button("Add the service") #crea il pulsante
+
+
+	bbox = Gtk.HButtonBox()
+	bbox.set_border_width(5)
+	#bbox.set_layout(gtk.BUTTONBOX_END) <---------------------------------------------- I can't find BUTTONBOX_END in gi.repository! Help! :S
+	bbox.set_spacing(10)
+	create_button = Gtk.Button(stock=Gtk.STOCK_OK)
 	create_button.connect("clicked", self.new_service_add, name_entry, 
 	                                                       album_url_entry, 
 	                                                       artist_url_entry)
-	vbox.pack_start(create_button, False, False, 10)
+	bbox.add(create_button)
 
+	cancel_button = Gtk.Button(stock=Gtk.STOCK_CANCEL)
+	bbox.add(cancel_button)
+	cancel_button.connect_object("clicked", Gtk.Widget.destroy, self.window)
+
+	#button = Gtk.Button(stock=Gtk.STOCK_HELP) #Future development
+	#bbox.add(button)
+	vbox.pack_start(bbox, False, False, 0)
         self.window.add(vbox)
 	self.window.show_all()
 	return
