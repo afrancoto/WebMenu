@@ -228,7 +228,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
  
     def change_order_window(self, widget, data=None):
 	self.window = Gtk.Window()
-	self.window.set_default_size(300,-1)
+	self.window.set_default_size(250,-1)
 	liststore = Gtk.ListStore(str)
 	for service in services_order: liststore.append([service])
 	
@@ -252,8 +252,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         hbox.pack_start(button_down, False, False, 0)
 
 	done_button = Gtk.Button(stock=Gtk.STOCK_OK)
-	done_button.set_alignement(1,0)
-	hbox.pack_start(done_button, False, False, 0)
+	hbox.pack_end(done_button, False, False, 0)
 	done_button.connect_object("clicked", Gtk.Widget.destroy, self.window)
 
 	vbox.pack_start(hbox, False, True, 5)
