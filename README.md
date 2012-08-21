@@ -14,6 +14,6 @@ TO DO
   - Add it's checkbox in the config window [DONE]
 - Add a 'Set service order' button at the right of the 'Add a new service' button in the config window 
   - Let it open a new widget with an orderable list [DONE]
-  - Add remove service button under the list
+  - Add remove service button under the list [NOT WORKING]
   - Reorder the menus -> Redraw the menu
 - Add an 'All' checkbox for both the submenus in the config window [DONE]
