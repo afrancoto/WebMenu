@@ -21,6 +21,9 @@ import urllib2
 from WebMenu_config import WMConfig
 from WebMenu_config import WMConfigDialog
 
+ui_id= None  #No previously drawn menus
+ui_context_id=None
+
 services = {}
 web_menu_item = '''
   <ui>
@@ -75,7 +78,9 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "draw_menu" function creates the 'Web' menu and associates every entry to its specific function
 ##########
 
-  def draw_menu(self, shell): 
+  def draw_menu(self, shell):
+    global services, services_order, other_settings
+    global ui_id
     #0. Web Menu
     action_group = Gtk.ActionGroup(name='WebMenuActionGroup')
     web_menu_action = Gtk.Action("WebMenuAction", _("Web"), None, None)
@@ -130,15 +135,19 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     ui = web_menu_item % (ui_album, ui_artist) #Adds ui_album and ui_artist to the webmenu
     ui_manager = shell.props.ui_manager
+    if ui_id is not None: 
+	ui_manager.remove_ui(ui_id) #Delete a previous drawn menu
+	os.system("echo Old menu deleted")
     ui_manager.insert_action_group(action_group)
-    self.ui_id = ui_manager.add_ui_from_string(ui)
+    ui_id = ui_manager.add_ui_from_string(ui)
     ui_manager.ensure_update()
 
 ##########
 #The "draw_context_menu" function creates the entries in the context menu and associates them to their specific function.
 ##########
   def draw_context_menu(self, shell):
-
+    global services, services_order, other_settings
+    global ui_context_id
     #0. Web Context Menu
     action_group = Gtk.ActionGroup(name='WebMenuContextActionGroup')
     #0.1 Song on Youtube
@@ -180,18 +189,26 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     ui = web_context_item % ((ui_album, ui_artist)*4) #Adds ui_album and ui_artist to the web context menu
     ui_manager = shell.props.ui_manager
     ui_manager.insert_action_group(action_group)
-    self.ui_context_id = ui_manager.add_ui_from_string(ui)
+    if ui_context_id is not None:  
+	ui_manager.remove_ui(ui_context_id) #Delete a previous drawn menu
+	os.system("echo Old context menu deleted")
+    ui_context_id = ui_manager.add_ui_from_string(ui)
     ui_manager.ensure_update()
 
 ##########
 #The "apply_settings" function is called when Rhythmbox is loaded and whenever the settings are changed
 ##########
   def apply_settings(self, settings, key, shell):
+    global services, services_order, other_settings
+
     #The global variables are updated if changed
     if key is 'services' or 'all': services = self.settings['services']
     if key is 'services-order' or 'all': services_order = self.settings['services-order']
     if key is 'other-settings' or 'all': other_settings = self.settings['other-settings']
     
+    self.draw_menu(shell)#Redraws the menus
+    self.draw_context_menu(shell)
+	
     os.system("echo apply_settings: "+ key)
 
     paths=["/MenuBar/WebMenu", "/QueuePlaylistViewPopup/PluginPlaceholder", "/BrowserSourceViewPopup/PluginPlaceholder", "/PlaylistViewPopup/PluginPlaceholder", "/PodcastViewPopup/PluginPlaceholder"] #Settings must be applied to the Web Menu and to every context menu
@@ -199,7 +216,9 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 	for service, data in services.items():
 		menu_option=path+"/AlbumMenu/AL_"+service  #Hides the non-active options in the "Album" submenu
 		if services[service][1] is not '':
-			if services[service][3]: shell.props.ui_manager.get_widget(menu_option).show()
+			if services[service][3]: 
+				os.system("echo showing "+menu_option)
+				shell.props.ui_manager.get_widget(menu_option).show()
 			else: shell.props.ui_manager.get_widget(menu_option).hide()
 
 		menu_option=path+"/ArtistMenu/AR_"+service  #Hides the non-active options in the "Artist" submenu
@@ -250,10 +269,10 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
   def do_deactivate(self):
     shell = self.object
     ui_manager = shell.props.ui_manager
-    ui_manager.remove_ui(self.ui_id) 
-    del self.ui_id
-    ui_manager.remove_ui(self.ui_context_id)
-    del self.ui_context_id
+    ui_manager.remove_ui(ui_id) 
+    del ui_id
+    ui_manager.remove_ui(ui_context_id)
+    del ui_context_id
 
 ##########
 #The "get_metadata" function gets and returns, in order, TITLE, ALBUM and ARTIST of the current playing song as elements of an array (0,1,2)
