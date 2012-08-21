@@ -24,5 +24,11 @@
 			<summary>The menus are displayed in this order</summary>
 			<description>The menus are displayed in this order</description>
 	</key>
+
+	<key type="ab" name="other-settings">
+			<default>[true, true, true]</default>
+			<summary>Boolean settings for: ['Options' item, 'All' item in album menu, 'All' item in artist menu]</summary>
+			<description>Boolean settings for: ['Options' item, 'All' item in album menu, 'All' item in artist menu]</description>
+	</key>
   </schema>
 </schemalist>
