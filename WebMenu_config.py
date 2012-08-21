@@ -251,6 +251,10 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         button_down.connect("clicked", self.change_order, treeview, liststore, 'down')
         hbox.pack_start(button_down, False, False, 0)
 
+        delete_button = Gtk.Button('Delete service')
+        delete_button.connect("clicked", self.delete_service, treeview, liststore)
+        hbox.pack_start(delete_button, False, False, 0)
+
 	done_button = Gtk.Button(stock=Gtk.STOCK_OK)
 	hbox.pack_end(done_button, False, False, 0)
 	done_button.connect_object("clicked", Gtk.Widget.destroy, self.window)
@@ -261,6 +265,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	return
  
     def change_order(self, widget, treeview, liststore, direction):
+	#TODO: Need to update the menus
 	(model, tree_iter) =  treeview.get_selection().get_selected()
         service = model.get_value(tree_iter,0)
 
@@ -276,3 +281,23 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	for service in services_order: liststore.append([service])
 	treeview.set_cursor(moved_two_index)
 	return
+
+    def delete_service(self, widget, treeview, liststore):
+	#TODO: Doesn't Work + Need to update the menus
+	(model, tree_iter) =  treeview.get_selection().get_selected()
+        service = model.get_value(tree_iter,0)
+
+	question = _("Are you sure you want to delete '"+service+"' from WebMenu?")
+    	#win = self.get_toplevel() 
+    	dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question) 
+    	response = dialog.run()
+	os.system("echo "+str(response))
+	dialog.destroy()
+
+	if response is True: 
+		services_order.remove[service]
+		self.settings['services-order']=services_order
+		
+		liststore.clear()
+		for service in services_order: liststore.append([service])
+		treeview.set_cursor(deleted_one_index)
