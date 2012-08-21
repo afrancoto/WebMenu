@@ -187,12 +187,13 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "apply_settings" function is called when Rhythmbox is loaded and whenever the settings are changed
 ##########
   def apply_settings(self, settings, key, shell):
-    #The global variables are updated
-    services = self.settings['services']
-    services_order = self.settings['services-order']
-    other_settings = self.settings['other-settings']
+    #The global variables are updated if changed
+    if key is 'services' or 'all': services = self.settings['services']
+    if key is 'services-order' or 'all': services_order = self.settings['services-order']
+    if key is 'other-settings' or 'all': other_settings = self.settings['other-settings']
     
-    #os.system("echo apply_settings:"+ settings)
+    os.system("echo apply_settings: "+ key)
+
     paths=["/MenuBar/WebMenu", "/QueuePlaylistViewPopup/PluginPlaceholder", "/BrowserSourceViewPopup/PluginPlaceholder", "/PlaylistViewPopup/PluginPlaceholder", "/PodcastViewPopup/PluginPlaceholder"] #Settings must be applied to the Web Menu and to every context menu
     for path in paths:
 	for service, data in services.items():
@@ -236,7 +237,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     self.draw_menu(shell) #Calls "draw_menu"
     self.draw_context_menu(shell) #Calls "draw_context_menu"
 
-    self.apply_settings('oldsettings', None , shell) #Calls "apply_settings"
+    self.apply_settings('oldsettings', 'all' , shell) #Calls "apply_settings"
     self.settings.connect('changed', self.apply_settings, shell) #Connects a change in the settings menus to "apply_settings"
 
     sp=shell.props.shell_player #Connects play/stop events to "song_changed")

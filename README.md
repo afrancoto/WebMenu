@@ -2,7 +2,7 @@ RHYTHMBOX Web Menu 2.0 (Work in progress)
 ======================
 
 TO DO
---------------------
+------
 - Complete the add_new_service implementation
   - Move left the main_label
   - Make the description label become a tip box when the mouse is over an 'Help' icon
