@@ -59,12 +59,13 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         dialog = Gtk.VBox()
     	
 	vbox=Gtk.VBox(False, 0)
+	vbox.set_margin_left(15)
+	vbox.set_margin_right(15)
 	hbox=Gtk.HBox()
 
 	albumvbox = Gtk.VBox()
 	albumlabel = Gtk.Label("<b>Album Submenu:</b>", use_markup=True) #Frome here: 'Album' vertical box    
 	albumvbox.pack_start(albumlabel, False, False, 5)
-        albumvbox.set_margin_left(15)
 	albumvbox.set_margin_right(15)
         for service in services_order:
 	    if services[service][1] is not '': #If the album URL is empty does not display the option
@@ -77,7 +78,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	albumvbox.pack_start(albumhseparator, False, False, 0)
 	check = Gtk.CheckButton("All") #The 'All'-album checkbox
         check.set_active(self.settings['other-settings'][1])
-	check.connect("toggled", self.all_option_toggled, 1) #The last argument, 1, stands for "Album"   
+	check.connect("toggled", self.other_settings_toggled, 1) #The last argument, 1, stands for "Album"   
 	albumvbox.pack_start(check, False, False, 0)
 	
         hbox.pack_start(albumvbox, False, False, 0)
@@ -86,7 +87,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	artistvbox = Gtk.VBox()
 	artistvbox.pack_start(artistlabel, False, False, 5)
         artistvbox.set_margin_left(15)
-	artistvbox.set_margin_right(15)
         for service in services_order:
 	    if services[service][2] is not '': #If the artist URL is empty does not display the option
 		    check = Gtk.CheckButton(service)
@@ -98,11 +98,16 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	artistvbox.pack_start(artisthseparator, False, False, 0)
 	check = Gtk.CheckButton("All") #The 'All'-artist checkbox
         check.set_active(self.settings['other-settings'][2])
-	check.connect("toggled", self.all_option_toggled, 2) #The last argument, 2, stands for "Album"   
+	check.connect("toggled", self.other_settings_toggled, 2) #The last argument, 2, stands for "Album"   
 	artistvbox.pack_start(check, False, False, 0)
        
         hbox.pack_start(artistvbox, False, False, 0)
-	vbox.pack_start(hbox, False, False, 10)
+	vbox.pack_start(hbox, False, False, 0)
+
+	check = Gtk.CheckButton("Show the 'Options' item in the Web Menu") #The 'Options' checkbox
+        check.set_active(self.settings['other-settings'][0])
+	check.connect("toggled", self.other_settings_toggled, 0) #The last argument, 2, stands for the "Options" item
+	vbox.pack_start(check, False, False, 10)
 
 	new_button = Gtk.Button("Add a service") #crea il pulsante
 	new_button.connect("clicked", self.new_service_window)
@@ -124,10 +129,10 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	#after asigning the new data, you should persist the services
 	self.settings['services'] = services
 
-    def all_option_toggled(self, checkbutton, what):
+    def other_settings_toggled(self, checkbutton, what):
 	options_list=self.settings['other-settings']
 	options_list[what] = checkbutton.get_active()
-	self.settings['other-settings']=options_list	
+	self.settings['other-settings']=options_list
 
     def update_search(self, widget, data=None):
     	webbrowser.open("https://github.com/afrancoto/WebMenu/downloads")
