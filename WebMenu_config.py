@@ -159,12 +159,21 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	vbox.pack_start(hbox, False, False, 10)
 
 	create_button = Gtk.Button("Add the service") #crea il pulsante
-	create_button.connect("clicked", self.new_service_add)
+	create_button.connect("clicked", self.new_service_add, name_entry, 
+	                                                       album_url_entry, 
+	                                                       artist_url_entry)
 	vbox.pack_start(create_button, False, False, 10)
 
         self.window.add(vbox)
 	self.window.show_all()
 	return
 
-    def new_service_add(self, widget, data=None):
-	return
+    def new_service_add(self, widget, name, album, artist):
+        #TODO: dinamically add the items on the menu and context AND the checkboxs
+        #on the active configuration dialog
+        
+        services[name.get_text()] = ('', album.get_text(), artist.get_text(),
+                                                           False, False)
+        self.settings['services'] = services
+	    
+        self.window.destroy()
