@@ -87,8 +87,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action(album_menu_action)
     #0.2.X Album SubMenu Items
     ui_album=''
-    for service, data in services.items():
-	if services[service][1] is not '':
+    for service in services_order:
+	if services[service][1] is not '':  #If the album URL is empty does not display the option
  		#Add a new submenu item	
         	action_name = 'album_%s' % service
         	ui_album += '<menuitem name="AL_%s" action="%s"/>' % (service, action_name) #ui_album is the Album submenu
@@ -107,8 +107,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action(artist_menu_action)
     #0.3.X Artist SubMenu Items 
     ui_artist=''
-    for service, data in services.items():
-	if services[service][2] is not '':
+    for service in services_order:
+	if services[service][2] is not '':  #If the artist URL is empty does not display the option
  		#Add a new submenu item	
         	action_name = 'artist_%s' % service
         	ui_artist += '<menuitem name="AR_%s" action="%s"/>' % (service, action_name) #ui_artist is the Artist submenu
@@ -141,8 +141,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action_with_accel (youtube_action, "<alt>Y")
     #0.2.X Album SubMenu
     ui_album=''
-    for service, data in services.items():
-	if services[service][1] is not '':
+    for service in services_order:
+	if services[service][1] is not '':  #If the album URL is empty does not display the option
  		#Add a new submenu item	
         	action_name = 'album_%s_cx' % service
         	ui_album += '<menuitem name="AL_%s" action="%s"/>' % (service, action_name) #ui_album is the Album submenu
@@ -157,8 +157,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     #0.3.X Artist SubMenu
     ui_artist=''
-    for service, data in services.items():
-	if services[service][2] is not '':
+    for service in services_order:
+	if services[service][2] is not '':  #If the artist URL is empty does not display the option
  		#Add a new submenu item	
         	action_name = 'artist_%s_cx' % service
         	ui_artist += '<menuitem name="AR_%s" action="%s"/>' % (service, action_name) #ui_artist is the Artist submenu
@@ -203,11 +203,13 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     #Services data are stored in a dict like this:
     #     STRING            0:STRING          1:STRING          2:STRING               3:BOOLEAN                  4:BOOLEAN
     # 'service_name' : ('song_engine_url','album_engine_url','artist_engine_url', enabled_in_album_submenu, enabled_in_artist_submenu)
-    global services
+    global services, services_order
     shell = self.object
     config = WMConfig()
+    config.check_services_order() #Differences between "services" and "service-order" keys are eliminated
     self.settings = config.get_settings()
     services = self.settings['services'] #'services' is a global variable with all the settings in it
+    services_order = self.settings['services-order'] #'services-order' is a global variable that keeps the right order for the menu items
 
     self.draw_menu(shell) #Calls "draw_menu"
     self.draw_context_menu(shell) #Calls "draw_context_menu"
@@ -272,15 +274,15 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "replace_keywords" function simply replace the keywords with the metadata
 ##########
   def replace_keywords(self, URL, metadata):
-    URL=URL.replace('[ALBUM]', metadata[1])
-    URL=URL.replace('[ARTIST]', metadata[2])
+    URL=URL.replace('[ALBUM]', urllib2.quote(metadata[1]))
+    URL=URL.replace('[ARTIST]', urllib2.quote(metadata[2]))
     return URL
 
 ##########
 #The "search_on_all" function search the artist OR the album on every service which is activ; "what" argument: 0=title (not used), 1=album, 2=artist
 ##########
   def search_on_all(self, event, shell, what, context=False):
-    for service, data in services.items(): 
+    for service in services_order: 
 	if services[service][what+2] and (services[service][what] is not ''): 
 		self.unique_search_function('searchonall', shell, what, service, context)
 
