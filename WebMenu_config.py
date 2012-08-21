@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import webbrowser
+import webbrowser, os
 #from WebMenu import WebMenuPlugin
 
 from gi.repository import Gio
@@ -108,16 +108,23 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         check.set_active(self.settings['other-settings'][0])
 	check.connect("toggled", self.other_settings_toggled, 0) #The last argument, 2, stands for the "Options" item
 	vbox.pack_start(check, False, False, 10)
-
+	
+	bbox = Gtk.HBox()
+	bbox.set_spacing(0)
 	new_button = Gtk.Button("Add a service") #crea il pulsante
 	new_button.connect("clicked", self.new_service_window)
-	vbox.pack_start(new_button, False, False, 0)
+	bbox.pack_start(new_button, True, True, 0)
+
+	order_button = Gtk.Button("Change services order") #crea il pulsante
+	order_button.connect("clicked", self.change_order_window)
+	bbox.pack_start(order_button, False, True, 0)	
+	vbox.pack_start(bbox, False, False, 0)
 
 	update_button = Gtk.Button("Look for updates (Current Version: "+CURRENT_VERSION+")") #crea il pulsante
 	update_button.connect("clicked", self.update_search)
 	vbox.pack_start(update_button, False, False, 0)
 
-        dialog.pack_start(vbox, False, False, 0)
+        dialog.pack_start(vbox, True, False, 0)
         dialog.show_all()
         
         return dialog
@@ -218,3 +225,55 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         	self.settings['services-order']=services_order
 
         self.window.destroy()
+ 
+    def change_order_window(self, widget, data=None):
+	self.window = Gtk.Window()
+	self.window.set_default_size(300,-1)
+	liststore = Gtk.ListStore(str)
+	for service in services_order: liststore.append([service])
+	
+	vbox=Gtk.VBox()
+	treeview = Gtk.TreeView(liststore)
+	treeview.set_cursor(0)
+	#treeview.set_mode(Gtk.SELECTION_SINGLE)
+
+	rendererText = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Service", rendererText, text=0) 
+        treeview.append_column(column)
+	vbox.pack_start(treeview, False, False, 5)
+           
+	hbox=Gtk.HBox()
+        button_up = Gtk.Button(u'\u2191')
+        button_up.connect("clicked", self.change_order, treeview, liststore, 'up')
+        hbox.pack_start(button_up, False, False, 0)
+            
+        button_down = Gtk.Button(u'\u2193')
+        button_down.connect("clicked", self.change_order, treeview, liststore, 'down')
+        hbox.pack_start(button_down, False, False, 0)
+
+	done_button = Gtk.Button(stock=Gtk.STOCK_OK)
+	done_button.set_alignement(1,0)
+	hbox.pack_start(done_button, False, False, 0)
+	done_button.connect_object("clicked", Gtk.Widget.destroy, self.window)
+
+	vbox.pack_start(hbox, False, True, 5)
+	self.window.add(vbox)
+	self.window.show_all()
+	return
+ 
+    def change_order(self, widget, treeview, liststore, direction):
+	(model, tree_iter) =  treeview.get_selection().get_selected()
+        service = model.get_value(tree_iter,0)
+
+	moved_one_index=services_order.index(service)
+	if direction is 'down': moved_two_index=moved_one_index + 1
+	if direction is 'up': moved_two_index=moved_one_index - 1
+	
+	services_order[moved_one_index]=services_order[moved_two_index]
+	services_order[moved_two_index]=service
+	self.settings['services-order']=services_order
+
+	liststore.clear()
+	for service in services_order: liststore.append([service])
+	treeview.set_cursor(moved_two_index)
+	return
