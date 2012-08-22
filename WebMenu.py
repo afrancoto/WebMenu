@@ -89,10 +89,12 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     try: ui_id
     except NameError: menu_not_drawn=True #If the ui_context_id does not exist, the menu is not yet drawn, so it is not deleted
 
+    os.system("echo draw_menu: "+ str(not menu_not_drawn))
     if not menu_not_drawn :
 	ui_manager.remove_ui(ui_id) #Delete a previous drawn menu
 	del ui_id
 	ui_manager.ensure_update()
+    os.system("echo \"it's him! Kill it with fire!!!\"")	
 
     #0. Web Menu
     action_group = Gtk.ActionGroup(name='WebMenuActionGroup')
@@ -225,7 +227,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 	services_order = self.settings['services-order']
     	other_settings = self.settings['other-settings']
 
-    config.check_services_order()
+    config.check_services_order() #Checks settings integrity
     
     self.draw_menu(shell)#Redraws the menus
     self.draw_context_menu(shell)
@@ -269,7 +271,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     shell = self.object
     config = WMConfig()
-    config.check_services_order()
     self.settings = config.get_settings()
     services = self.settings['services'] #'services' is a global variable with all the settings in it
     services_order = self.settings['services-order'] #'services-order' is a global variable that keeps the right order for the menu items

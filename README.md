@@ -5,6 +5,8 @@ TO DO
 =====
 - Manage window
   - Remove error on call from Rhythmbox Plugins window
+  - Bug: Manage window does not close after Add service + Apply
+  - Remove Waring on apply_settings
   - Reorder the menus in the settings[DONE] -> Redraw the menus [DONE]
   - Must completely substitute the config window [DONE]
   - Let it open a new widget with an orderable list [DONE]

@@ -364,5 +364,5 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	self.settings['services']=services
 	self.settings['services-order']=services_order
 	self.settings['other-settings']=other_settings
-	Gtk.Widget.destroy(self.window)
+	self.window.destroy()
 
