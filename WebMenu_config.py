@@ -299,10 +299,12 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	os.system("echo "+str(response))
 	dialog.destroy()
 
-	if response is True: 
-		services_order.remove[service]
-		self.settings['services-order']=services_order
-		
-		liststore.clear()
-		for service in services_order: liststore.append([service])
-		treeview.set_cursor(deleted_one_index)
+	if response == Gtk.ResponseType.YES:
+	    del services[service]
+	    services_order.remove(service)
+	    self.settings['services-order']=services_order
+	    self.settings['services'] = services
+	    
+	    liststore.clear()
+	    for service in services_order: liststore.append([service])
+	    #treeview.set_cursor(deleted_one_index)
