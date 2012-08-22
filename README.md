@@ -20,6 +20,6 @@ TO DO
   - Let it open a new widget with an orderable list [DONE]
   - Reorder the menus in the settings[DONE]
   - Redraw the menu [NOT WORKING]
-  - Add remove service button under the list [NOT WORKING]
+  - Add remove service button under the list [DONE]
 
 - Add an 'All' checkbox for both the submenus in the config window [DONE]

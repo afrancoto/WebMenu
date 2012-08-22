@@ -20,7 +20,6 @@ from gi.repository import Gio
 from gi.repository import GObject
 from gi.repository import PeasGtk
 from gi.repository import Gtk
-#from gi.repository import RB
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.webmenu'
 CURRENT_VERSION = '1.0'
@@ -36,6 +35,7 @@ class WMConfig(object):
         return self.settings
 
     def check_services_order(self):
+	global services, services_order
 	changed=False #The services order is rewritten only if it is changed by this function
 	for service, data in services.items():
 		if service not in services_order: 
@@ -109,16 +109,9 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	check.connect("toggled", self.other_settings_toggled, 0) #The last argument, 2, stands for the "Options" item
 	vbox.pack_start(check, False, False, 10)
 	
-	bbox = Gtk.HBox()
-	bbox.set_spacing(0)
-	new_button = Gtk.Button("Add a service") #crea il pulsante
-	new_button.connect("clicked", self.new_service_window)
-	bbox.pack_start(new_button, True, True, 0)
-
-	order_button = Gtk.Button("Change services order") #crea il pulsante
-	order_button.connect("clicked", self.change_order_window)
-	bbox.pack_start(order_button, False, True, 0)	
-	vbox.pack_start(bbox, False, False, 0)
+	manage_button = Gtk.Button("Manage services") #crea il pulsante
+	manage_button.connect("clicked", self.manage_window)
+	vbox.pack_start(manage_button, False, False, 0)
 
 	update_button = Gtk.Button("Look for updates (Current Version: "+CURRENT_VERSION+")") #crea il pulsante
 	update_button.connect("clicked", self.update_search)
@@ -130,6 +123,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         return dialog
      
     def website_toggled(self, checkbutton, service, what):
+	global services
 	data = list(services[service])
 	data[what+2] = checkbutton.get_active()
 	services[service]= tuple(data)
@@ -144,7 +138,86 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
     def update_search(self, widget, data=None):
     	webbrowser.open("https://github.com/afrancoto/WebMenu/downloads")
 
-    def new_service_window(self, widget, data=None):
+    def manage_window(self, widget, data=None):
+	self.window = Gtk.Window()
+	self.window.set_default_size(1000,300)
+	liststore = Gtk.ListStore(str, str, str)
+	for service in services_order: liststore.append([service, services[service][1], services[service][2]])
+	
+	vbox=Gtk.VBox()
+	treeview = Gtk.TreeView(liststore)
+	treeview.set_cursor(0)
+	#treeview.set_mode(Gtk.SELECTION_SINGLE)
+
+	rendererText = Gtk.CellRendererText()
+        column_0 = Gtk.TreeViewColumn("Service", rendererText, text=0)
+	column_0.set_resizable(True)
+	column_0.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        column_0.set_fixed_width(100)
+        treeview.append_column(column_0)
+        column_1 = Gtk.TreeViewColumn("Album URL", rendererText, text=1)
+	column_1.set_resizable(True)
+	column_1.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        column_1.set_fixed_width(450)
+        treeview.append_column(column_1)
+        column_2 = Gtk.TreeViewColumn("Artist URL", rendererText, text=2) 
+	column_2.set_resizable(True)
+	column_2.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        column_2.set_fixed_width(450)
+        treeview.append_column(column_2)
+
+	scroll = Gtk.ScrolledWindow()
+    	scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+    	scroll.add(treeview)
+	
+	vbox.pack_start(scroll, True, True, 5)
+           
+	hbox=Gtk.HBox()
+        button_up = Gtk.Button(u'\u2191')
+        button_up.connect("clicked", self.change_order, treeview, liststore, 'up')
+        hbox.pack_start(button_up, False, False, 0)
+            
+        button_down = Gtk.Button(u'\u2193')
+        button_down.connect("clicked", self.change_order, treeview, liststore, 'down')
+        hbox.pack_start(button_down, False, False, 0)
+
+	new_button = Gtk.Button("Add a service")
+	new_button.connect("clicked", self.new_service_window, treeview, liststore)
+	hbox.pack_start(new_button, False, False, 0)
+
+        delete_button = Gtk.Button('Delete service')
+        delete_button.connect("clicked", self.delete_service, treeview, liststore)
+        hbox.pack_start(delete_button, False, False, 0)
+
+	done_button = Gtk.Button(stock=Gtk.STOCK_OK)
+	hbox.pack_end(done_button, False, False, 0)
+	done_button.connect_object("clicked", Gtk.Widget.destroy, self.window)
+
+	vbox.pack_start(hbox, False, True, 5)
+	self.window.add(vbox)
+	self.window.show_all()
+	return
+ 
+    def change_order(self, widget, treeview, liststore, direction):
+	#TODO: Need to update the menus
+	global services, services_order
+	(model, tree_iter) =  treeview.get_selection().get_selected()
+        service = model.get_value(tree_iter,0)
+
+	moved_one_index=services_order.index(service)
+	if direction is 'down': moved_two_index=moved_one_index + 1
+	if direction is 'up': moved_two_index=moved_one_index - 1
+	
+	services_order[moved_one_index]=services_order[moved_two_index]
+	services_order[moved_two_index]=service
+	self.settings['services-order']=services_order
+
+	liststore.clear()
+	for service in services_order: liststore.append([service, services[service][1], services[service][2]])
+	treeview.set_cursor(moved_two_index)
+	return
+
+    def new_service_window(self, widget, treeview, liststore):
 	self.window = Gtk.Window()
 
 	vbox=Gtk.VBox(False, 0)
@@ -189,9 +262,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	hbox.pack_start(vbox_entries, False, False, 0)	
 	vbox.pack_start(hbox, False, False, 10)
 
-	#create_button = Gtk.Button("Add the service") #crea il pulsante
-
-
 	bbox = Gtk.HButtonBox()
 	bbox.set_border_width(5)
 	#bbox.set_layout(gtk.BUTTONBOX_END) <---------------------------------------------- I can't find BUTTONBOX_END in gi.repository! Help! :S
@@ -199,7 +269,8 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	create_button = Gtk.Button(stock=Gtk.STOCK_OK)
 	create_button.connect("clicked", self.new_service_add, name_entry, 
 	                                                       album_url_entry, 
-	                                                       artist_url_entry)
+	                                                       artist_url_entry,
+							       treeview, liststore)
 	bbox.add(create_button)
 
 	cancel_button = Gtk.Button(stock=Gtk.STOCK_CANCEL)
@@ -213,9 +284,9 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	self.window.show_all()
 	return
 
-    def new_service_add(self, widget, name, album, artist):
-        #TODO: dinamically add the checkboxs
-        #on the active configuration dialog
+    def new_service_add(self, widget, name, album, artist, treeview, liststore):
+        #TODO: dinamically add the checkboxs on the active configuration dialog
+	global services, services_order
         service=name.get_text()
 	album_URL=album.get_text()
 	if (album_URL[:7] != "http://") and (album_URL[:8] != "https://"): album_URL="http://"+album_URL #Adds the http:// if it's not in the URL
@@ -229,71 +300,17 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	        self.settings['services'] = services #Writes the new service in dconf
         	self.settings['services-order']=services_order
 
-        self.window.destroy()
- 
-    def change_order_window(self, widget, data=None):
-	self.window = Gtk.Window()
-	self.window.set_default_size(250,-1)
-	liststore = Gtk.ListStore(str)
-	for service in services_order: liststore.append([service])
-	
-	vbox=Gtk.VBox()
-	treeview = Gtk.TreeView(liststore)
-	treeview.set_cursor(0)
-	#treeview.set_mode(Gtk.SELECTION_SINGLE)
-
-	rendererText = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn("Service", rendererText, text=0) 
-        treeview.append_column(column)
-	vbox.pack_start(treeview, False, False, 5)
-           
-	hbox=Gtk.HBox()
-        button_up = Gtk.Button(u'\u2191')
-        button_up.connect("clicked", self.change_order, treeview, liststore, 'up')
-        hbox.pack_start(button_up, False, False, 0)
-            
-        button_down = Gtk.Button(u'\u2193')
-        button_down.connect("clicked", self.change_order, treeview, liststore, 'down')
-        hbox.pack_start(button_down, False, False, 0)
-
-        delete_button = Gtk.Button('Delete service')
-        delete_button.connect("clicked", self.delete_service, treeview, liststore)
-        hbox.pack_start(delete_button, False, False, 0)
-
-	done_button = Gtk.Button(stock=Gtk.STOCK_OK)
-	hbox.pack_end(done_button, False, False, 0)
-	done_button.connect_object("clicked", Gtk.Widget.destroy, self.window)
-
-	vbox.pack_start(hbox, False, True, 5)
-	self.window.add(vbox)
-	self.window.show_all()
-	return
- 
-    def change_order(self, widget, treeview, liststore, direction):
-	#TODO: Need to update the menus
-	(model, tree_iter) =  treeview.get_selection().get_selected()
-        service = model.get_value(tree_iter,0)
-
-	moved_one_index=services_order.index(service)
-	if direction is 'down': moved_two_index=moved_one_index + 1
-	if direction is 'up': moved_two_index=moved_one_index - 1
-	
-	services_order[moved_one_index]=services_order[moved_two_index]
-	services_order[moved_two_index]=service
-	self.settings['services-order']=services_order
-
 	liststore.clear()
-	for service in services_order: liststore.append([service])
-	treeview.set_cursor(moved_two_index)
-	return
+	for service in services_order: liststore.append([service, services[service][1], services[service][2]])
+	treeview.set_cursor(len(services_order)-1)
+        self.window.destroy()
 
     def delete_service(self, widget, treeview, liststore):
-	#TODO: Doesn't Work + Need to update the menus
+	global services, services_order
 	(model, tree_iter) =  treeview.get_selection().get_selected()
         service = model.get_value(tree_iter,0)
 
 	question = _("Are you sure you want to delete '"+service+"' from WebMenu?")
-    	#win = self.get_toplevel() 
     	dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question) 
     	response = dialog.run()
 	os.system("echo "+str(response))
@@ -306,5 +323,5 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	    self.settings['services'] = services
 	    
 	    liststore.clear()
-	    for service in services_order: liststore.append([service])
+	    for service in services_order: liststore.append([service, services[service][1], services[service][2]])
 	    #treeview.set_cursor(deleted_one_index)
