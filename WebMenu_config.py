@@ -152,7 +152,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
     def manage_window(self, widget, data=None):
 	self.window = Gtk.Window()
-	self.window.set_default_size(1000,300)
+	self.window.set_default_size(1000,400)
 	liststore = Gtk.ListStore(str, str, str, bool, bool)
 	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
 	
@@ -173,8 +173,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	rendererAlbumCheck.connect("toggled", self.website_toggled_from_list, treeview, 1)
 	column_1 = Gtk.TreeViewColumn("Album", rendererAlbumCheck, active=3)
 	column_1.set_resizable(True)
-	column_1.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        column_1.set_fixed_width(50)
+
         treeview.append_column(column_1)
 
 	rendererArtistCheck = Gtk.CellRendererToggle()
@@ -182,8 +181,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	rendererArtistCheck.connect("toggled", self.website_toggled_from_list, treeview, 2)
 	column_2 = Gtk.TreeViewColumn("Artist", rendererArtistCheck, active=4)
 	column_2.set_resizable(True)
-	column_2.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        column_2.set_fixed_width(50)
         treeview.append_column(column_2)
 
 
@@ -202,9 +199,26 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	scroll = Gtk.ScrolledWindow()
     	scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
     	scroll.add(treeview)
-	
 	vbox.pack_start(scroll, True, True, 5)
-           
+        
+	other_settings_hbox=Gtk.HBox()
+	
+	all_album_check = Gtk.CheckButton("'All' in Album submenu") #The 'All'-album checkbox
+        all_album_check.set_active(self.settings['other-settings'][1])
+	all_album_check.connect("toggled", self.other_settings_toggled, 1) #The last argument, 1, stands for "Album"   
+	other_settings_hbox.pack_start(all_album_check, False, False, 10)
+
+	all_artist_check = Gtk.CheckButton("'All' in Artist submenu") #The 'All'-artist checkbox
+        all_artist_check.set_active(self.settings['other-settings'][2])
+	all_artist_check.connect("toggled", self.other_settings_toggled, 2) #The last argument, 1, stands for "Album"   
+	other_settings_hbox.pack_start(all_artist_check, False, False, 10)
+
+	options_check = Gtk.CheckButton("'Options' menu item") #The 'Options' checkbox
+        options_check.set_active(self.settings['other-settings'][0])
+	options_check.connect("toggled", self.other_settings_toggled, 0) #The last argument, 2, stands for the "Options" item
+	other_settings_hbox.pack_end(options_check, False, False, 10)
+	vbox.pack_start(other_settings_hbox, False, True, 5)
+
 	hbox=Gtk.HBox()
         button_up = Gtk.Button(u'\u2191')
         button_up.connect("clicked", self.change_order, treeview, liststore, 'up')
@@ -232,7 +246,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	return
  
     def change_order(self, widget, treeview, liststore, direction):
-	#TODO: Need to update the menus
+	#TODO: Need to update the menus correctly
 	global services, services_order
 	(model, tree_iter) =  treeview.get_selection().get_selected()
         service = model.get_value(tree_iter,0)
@@ -297,7 +311,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 	bbox = Gtk.HButtonBox()
 	bbox.set_border_width(5)
-	#bbox.set_layout(gtk.BUTTONBOX_END) <---------------------------------------------- I can't find BUTTONBOX_END in gi.repository! Help! :S
+	bbox.set_layout(Gtk.ButtonBoxStyle.END)
 	bbox.set_spacing(10)
 	create_button = Gtk.Button(stock=Gtk.STOCK_OK)
 	create_button.connect("clicked", self.new_service_add, name_entry, 
@@ -318,7 +332,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	return
 
     def new_service_add(self, widget, name, album, artist, treeview, liststore):
-        #TODO: dinamically add the checkboxs on the active configuration dialog
 	global services, services_order
         service=name.get_text()
 	album_URL=album.get_text()

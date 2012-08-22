@@ -10,9 +10,10 @@ TO DO
   - Reorder the menus in the settings[DONE] -> Redraw the menus [NOT WORKING]
   - Add checkboxes for the Album and Artis sub-menus [DONE] -> Redraw the menus [DONE]
   - Add remove service button under the list [DONE]
-  - Add Search for updated button
-  - Add 'All' options checkboxes
-  - Add 'Options' menu item checkbox
+  - Add 'All' options checkboxes [DONE]
+  - Add 'Options' menu item checkbox [DONE]
+  - Add Search for updates button
+  - Add 'Restore to default' button
 
 - 'Options' menu item
   - Make it work
