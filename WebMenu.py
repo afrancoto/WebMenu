@@ -21,8 +21,8 @@ import urllib2
 from WebMenu_config import WMConfig
 from WebMenu_config import WMConfigDialog
 
-ui_id= None  #No previously drawn menus
-ui_context_id=None
+#ui_id=None
+#ui_context_id=None
 
 services = {}
 web_menu_item = '''
@@ -78,9 +78,17 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "draw_menu" function creates the 'Web' menu and associates every entry to its specific function
 ##########
 
-  def draw_menu(self, shell):
-    global services, services_order, other_settings
+  def draw_menu(self, shell, key):
+    #global services, services_order, other_settings
+    global action_group
     global ui_id
+
+    ui_manager = shell.props.ui_manager
+    if key is not 'firsttime': 
+	ui_manager.remove_ui(ui_id) #Delete a previous drawn menu
+	ui_manager.remove_action_group(action_group)
+	del ui_id, action_group
+
     #0. Web Menu
     action_group = Gtk.ActionGroup(name='WebMenuActionGroup')
     web_menu_action = Gtk.Action("WebMenuAction", _("Web"), None, None)
@@ -89,6 +97,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     youtube_action = Gtk.Action ('search_on_youtube_action', _('Song on Youtube'), _('Look for the current playing song on Youtube'), "")
     youtube_action.connect ('activate', self.search_on_youtube, shell)
     action_group.add_action_with_accel (youtube_action, "<alt>Y")
+
     #0.2 Album SubMenu
     album_menu_action = Gtk.Action("album_menu_action", _("Album"), None, None)
     action_group.add_action(album_menu_action)
@@ -103,7 +112,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
         	action = Gtk.Action( action_name, service, _('Look for the current album on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 1, service)
         	action_group.add_action( action )
-
     #0.2.n Album -> Every Service
     album_all_action = Gtk.Action ('album_all', _('All'), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, 1) #The last argument "1" stands for "Album"
@@ -123,21 +131,18 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
         	action = Gtk.Action( action_name, service, _('Look for the current artist on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 2, service)
 	        action_group.add_action( action )
-
     #0.3.n Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all', _('All'), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_all_action)
+
     #0.4 Options
     options_action = Gtk.Action ('options_action', _('Options'), _('WebMenu Options'), "")
     options_action.connect ('activate', self.open_options, shell)
     action_group.add_action (options_action)
 
     ui = web_menu_item % (ui_album, ui_artist) #Adds ui_album and ui_artist to the webmenu
-    ui_manager = shell.props.ui_manager
-    if ui_id is not None: 
-	ui_manager.remove_ui(ui_id) #Delete a previous drawn menu
-	os.system("echo Old menu deleted")
+    os.system('echo "'+ui+'"')
     ui_manager.insert_action_group(action_group)
     ui_id = ui_manager.add_ui_from_string(ui)
     ui_manager.ensure_update()
@@ -145,15 +150,23 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
 #The "draw_context_menu" function creates the entries in the context menu and associates them to their specific function.
 ##########
-  def draw_context_menu(self, shell):
-    global services, services_order, other_settings
+  def draw_context_menu(self, shell, key):
+    #global services, services_order, other_settings
+    global context_action_group
     global ui_context_id
+
+    ui_manager = shell.props.ui_manager
+    if key is not 'firsttime':  
+	ui_manager.remove_ui(ui_context_id) #Delete a previous drawn menu
+	ui_manager.remove_action_group(context_action_group)
+	del ui_context_id, context_action_group
+
     #0. Web Context Menu
-    action_group = Gtk.ActionGroup(name='WebMenuContextActionGroup')
+    context_action_group = Gtk.ActionGroup(name='WebMenuContextActionGroup')
     #0.1 Song on Youtube
     youtube_action = Gtk.Action ('search_on_youtube_action_cx', _('Song on Youtube'), _('Look for the selected song on Youtube'), "")
     youtube_action.connect ('activate', self.search_on_youtube, shell, True) #"True" says that the command is launched from the context menu
-    action_group.add_action_with_accel (youtube_action, "<alt>Y")
+    context_action_group.add_action_with_accel (youtube_action, "<alt>Y")
     #0.2.X Album SubMenu
     ui_album=''
     for service in services_order:
@@ -164,11 +177,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 	        #Create the action
        		action = Gtk.Action( action_name, service, _('Look for the selected album on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 1, service, True )
-        	action_group.add_action( action )
+        	context_action_group.add_action( action )
     #0.2.n Album -> Every Service
     album_all_action = Gtk.Action ('album_all_cx', _('All'), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, 1, True) #The last argument "1" stands for "Album"
-    action_group.add_action(album_all_action)
+    context_action_group.add_action(album_all_action)
 
     #0.3.X Artist SubMenu
     ui_artist=''
@@ -180,18 +193,14 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
         	#Create the action
        		action = Gtk.Action( action_name, service, _('Look for the selected artist on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 2, service, True )
-       		action_group.add_action( action )
+       		context_action_group.add_action( action )
     #0.3.n Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all_cx', _('All'), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, 2, True) #The last argument "2" stands for "Artist"
-    action_group.add_action(artist_all_action)
+    context_action_group.add_action(artist_all_action)
 
     ui = web_context_item % ((ui_album, ui_artist)*4) #Adds ui_album and ui_artist to the web context menu
-    ui_manager = shell.props.ui_manager
-    ui_manager.insert_action_group(action_group)
-    if ui_context_id is not None:  
-	ui_manager.remove_ui(ui_context_id) #Delete a previous drawn menu
-	os.system("echo Old context menu deleted")
+    ui_manager.insert_action_group(context_action_group)
     ui_context_id = ui_manager.add_ui_from_string(ui)
     ui_manager.ensure_update()
 
@@ -202,12 +211,13 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     global services, services_order, other_settings
 
     #The global variables are updated if changed
-    if key is 'services' or 'all': services = self.settings['services']
-    if key is 'services-order' or 'all': services_order = self.settings['services-order']
-    if key is 'other-settings' or 'all': other_settings = self.settings['other-settings']
+    if (key is not 'all') and (key is not 'firsttime'): 
+	services = self.settings['services']
+	services_order = self.settings['services-order']
+    	other_settings = self.settings['other-settings']
     
-    self.draw_menu(shell)#Redraws the menus
-    self.draw_context_menu(shell)
+    self.draw_menu(shell, key)#Redraws the menus
+    self.draw_context_menu(shell, key)
 	
     os.system("echo apply_settings: "+ key)
 
@@ -216,9 +226,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 	for service, data in services.items():
 		menu_option=path+"/AlbumMenu/AL_"+service  #Hides the non-active options in the "Album" submenu
 		if services[service][1] is not '':
-			if services[service][3]: 
-				os.system("echo showing "+menu_option)
-				shell.props.ui_manager.get_widget(menu_option).show()
+			if services[service][3]: shell.props.ui_manager.get_widget(menu_option).show()
 			else: shell.props.ui_manager.get_widget(menu_option).hide()
 
 		menu_option=path+"/ArtistMenu/AR_"+service  #Hides the non-active options in the "Artist" submenu
@@ -241,20 +249,23 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "do_activate" function is called when Rhythmbox is loaded
 ##########
   def do_activate(self):
+
     #Services data are stored in a dict like this:
     #     STRING            0:STRING          1:STRING          2:STRING               3:BOOLEAN                  4:BOOLEAN
     # 'service_name' : ('song_engine_url','album_engine_url','artist_engine_url', enabled_in_album_submenu, enabled_in_artist_submenu)
+
     global services, services_order, other_settings
+
     shell = self.object
     config = WMConfig()
-    config.check_services_order() #Differences between "services" and "service-order" keys are eliminated
+    config.check_services_order()
     self.settings = config.get_settings()
     services = self.settings['services'] #'services' is a global variable with all the settings in it
     services_order = self.settings['services-order'] #'services-order' is a global variable that keeps the right order for the menu items
     other_settings = self.settings['other-settings'] #'other-settings' is an array of booleans: ['Options' item, 'All' item in album menu, 'All' item in artist menu]
 
-    self.draw_menu(shell) #Calls "draw_menu"
-    self.draw_context_menu(shell) #Calls "draw_context_menu"
+    self.draw_menu(shell, 'firsttime') #Calls "draw_menu"
+    self.draw_context_menu(shell, 'firsttime') #Calls "draw_context_menu"
 
     self.apply_settings('oldsettings', 'all' , shell) #Calls "apply_settings"
     self.settings.connect('changed', self.apply_settings, shell) #Connects a change in the settings menus to "apply_settings"
@@ -267,12 +278,17 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "do_deactivate" function removes the 'Web' Menu and the context menu
 ##########
   def do_deactivate(self):
+    global ui_id, ui_context_id
+    global action_group, context_action_group
+
     shell = self.object
     ui_manager = shell.props.ui_manager
-    ui_manager.remove_ui(ui_id) 
-    del ui_id
+    ui_manager.remove_ui(ui_id)
+    del ui_id, action_group
+    ui_manager.remove_action_group(action_group)
     ui_manager.remove_ui(ui_context_id)
-    del ui_context_id
+    del ui_context_id, context_action_group
+    ui_manager.remove_action_group(context_action_group)
 
 ##########
 #The "get_metadata" function gets and returns, in order, TITLE, ALBUM and ARTIST of the current playing song as elements of an array (0,1,2)

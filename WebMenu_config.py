@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import webbrowser, os
-#from WebMenu import WebMenuPlugin
+import urllib2
 
 from gi.repository import Gio
 from gi.repository import GObject
@@ -214,11 +214,16 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	return
 
     def new_service_add(self, widget, name, album, artist):
-        #TODO: dinamically add the items on the menu and context AND the checkboxs
+        #TODO: dinamically add the checkboxs
         #on the active configuration dialog
         service=name.get_text()
+	album_URL=album.get_text()
+	if (album_URL[:7] != "http://") and (album_URL[:8] != "https://"): album_URL="http://"+album_URL #Adds the http:// if it's not in the URL
+	artist_URL=artist.get_text()
+	if (artist_URL[:7] != "http://") and (artist_URL[:8] != "https://"): artist_URL="http://"+artist_URL #Adds the http:// if it's not in the URL
+	
 	if service is not '':
-        	services[service] = ('', album.get_text(), artist.get_text(), True, True) #Gets the new service
+        	services[service] = ('', album_URL, artist_URL , True, True) #Gets the new service
 		services_order.append(service)
 	
 	        self.settings['services'] = services #Writes the new service in dconf
