@@ -3,23 +3,16 @@ RHYTHMBOX Web Menu 2.0 (Work in progress)
 
 TO DO
 =====
-- Add a new service
-  - Add the new service in the settings [DONE] -> Redraw the menu [DONE]
-  - Add the checkboxes for the new services to the config window = Redraw the options window
-
-  - Move left the main_label
-  - Justify right the labels next to the entries
-  - Make the description label become a tip box when the mouse is over an 'Help' icon
-
+- Manage window
+  - Must completely substitute the config window
+  - Let it open a new widget with an orderable list [DONE]
+  - Add the new service in the settings [DONE] -> Redraw the menus [DONE]
+  - Reorder the menus in the settings[DONE] -> Redraw the menus [NOT WORKING]
+  - Add checkboxes for the Album and Artis sub-menus [DONE] -> Redraw the menus [DONE]
+  - Add remove service button under the list [DONE]
+  - Add Search for updated button
+  - Add 'All' options checkboxes
+  - Add 'Options' menu item checkbox
 
 - 'Options' menu item
-  - Add it's checkbox in the config window [DONE]
   - Make it work
-
-- Menu reordering
-  - Let it open a new widget with an orderable list [DONE]
-  - Reorder the menus in the settings[DONE]
-  - Redraw the menu [NOT WORKING]
-  - Add remove service button under the list [DONE]
-
-- Add an 'All' checkbox for both the submenus in the config window [DONE]

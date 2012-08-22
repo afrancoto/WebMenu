@@ -130,6 +130,18 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	#after asigning the new data, you should persist the services
 	self.settings['services'] = services
 
+    def website_toggled_from_list(self, checkbutton, path, treeview, what):
+	global services
+	(model, tree_iter) =  treeview.get_selection().get_selected()
+        service = model.get_value(tree_iter,0)
+	
+	data = list(services[service])
+	data[what+2] = not data[what+2]
+	model[path][what+2] = data[what+2]
+	services[service]= tuple(data)
+	#after asigning the new data, you should persist the services
+	self.settings['services'] = services
+
     def other_settings_toggled(self, checkbutton, what):
 	options_list=self.settings['other-settings']
 	options_list[what] = checkbutton.get_active()
@@ -141,8 +153,8 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
     def manage_window(self, widget, data=None):
 	self.window = Gtk.Window()
 	self.window.set_default_size(1000,300)
-	liststore = Gtk.ListStore(str, str, str)
-	for service in services_order: liststore.append([service, services[service][1], services[service][2]])
+	liststore = Gtk.ListStore(str, str, str, bool, bool)
+	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
 	
 	vbox=Gtk.VBox()
 	treeview = Gtk.TreeView(liststore)
@@ -155,16 +167,37 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	column_0.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
         column_0.set_fixed_width(100)
         treeview.append_column(column_0)
-        column_1 = Gtk.TreeViewColumn("Album URL", rendererText, text=1)
+
+	rendererAlbumCheck = Gtk.CellRendererToggle()
+	rendererAlbumCheck.set_property('activatable', True)
+	rendererAlbumCheck.connect("toggled", self.website_toggled_from_list, treeview, 1)
+	column_1 = Gtk.TreeViewColumn("Album", rendererAlbumCheck, active=3)
 	column_1.set_resizable(True)
 	column_1.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        column_1.set_fixed_width(450)
+        column_1.set_fixed_width(50)
         treeview.append_column(column_1)
-        column_2 = Gtk.TreeViewColumn("Artist URL", rendererText, text=2) 
+
+	rendererArtistCheck = Gtk.CellRendererToggle()
+	rendererArtistCheck.set_property('activatable', True)
+	rendererArtistCheck.connect("toggled", self.website_toggled_from_list, treeview, 2)
+	column_2 = Gtk.TreeViewColumn("Artist", rendererArtistCheck, active=4)
 	column_2.set_resizable(True)
 	column_2.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        column_2.set_fixed_width(450)
+        column_2.set_fixed_width(50)
         treeview.append_column(column_2)
+
+
+        column_3 = Gtk.TreeViewColumn("Album URL", rendererText, text=1)
+	column_3.set_resizable(True)
+	column_3.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        column_3.set_fixed_width(450)
+        treeview.append_column(column_3)
+        column_4 = Gtk.TreeViewColumn("Artist URL", rendererText, text=2) 
+	column_4.set_resizable(True)
+	column_4.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        column_4.set_fixed_width(450)
+        treeview.append_column(column_4)
+	
 
 	scroll = Gtk.ScrolledWindow()
     	scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -213,7 +246,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	self.settings['services-order']=services_order
 
 	liststore.clear()
-	for service in services_order: liststore.append([service, services[service][1], services[service][2]])
+	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
 	treeview.set_cursor(moved_two_index)
 	return
 
@@ -301,7 +334,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         	self.settings['services-order']=services_order
 
 	liststore.clear()
-	for service in services_order: liststore.append([service, services[service][1], services[service][2]])
+	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
 	treeview.set_cursor(len(services_order)-1)
         self.window.destroy()
 
@@ -323,5 +356,5 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	    self.settings['services'] = services
 	    
 	    liststore.clear()
-	    for service in services_order: liststore.append([service, services[service][1], services[service][2]])
+	    for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
 	    #treeview.set_cursor(deleted_one_index)
