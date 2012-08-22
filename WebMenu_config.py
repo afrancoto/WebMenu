@@ -301,10 +301,10 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 	if response == Gtk.ResponseType.YES:
 	    del services[service]
-        services_order.remove(service)
-        self.settings['services-order']=services_order
-        self.settings['services'] = services
-        
-        liststore.clear()
-        for service in services_order: liststore.append([service])
-        #treeview.set_cursor(deleted_one_index)
+	    services_order.remove(service)
+	    self.settings['services-order']=services_order
+	    self.settings['services'] = services
+	    
+	    liststore.clear()
+	    for service in services_order: liststore.append([service])
+	    #treeview.set_cursor(deleted_one_index)
