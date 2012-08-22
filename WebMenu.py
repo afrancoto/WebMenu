@@ -25,6 +25,7 @@ from WebMenu_config import WMConfigDialog
 #ui_context_id=None
 
 services = {}
+services_order = []
 web_menu_item = '''
   <ui>
     <menubar name="MenuBar">
@@ -79,7 +80,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
 
   def draw_menu(self, shell):
-    #global services, services_order, other_settings
     global action_group
     global ui_id
 
@@ -91,8 +91,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     if not menu_not_drawn :
 	ui_manager.remove_ui(ui_id) #Delete a previous drawn menu
-	ui_manager.remove_action_group(action_group)
-	del ui_id, action_group
+	del ui_id
+	ui_manager.ensure_update()
 
     #0. Web Menu
     action_group = Gtk.ActionGroup(name='WebMenuActionGroup')
@@ -147,7 +147,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action (options_action)
 
     ui = web_menu_item % (ui_album, ui_artist) #Adds ui_album and ui_artist to the webmenu
-    os.system('echo "'+ui+'"')
+    #os.system('echo "'+ui+'"')
     ui_manager.insert_action_group(action_group)
     ui_id = ui_manager.add_ui_from_string(ui)
     ui_manager.ensure_update()
@@ -156,7 +156,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "draw_context_menu" function creates the entries in the context menu and associates them to their specific function.
 ##########
   def draw_context_menu(self, shell):
-    #global services, services_order, other_settings
     global context_action_group
     global ui_context_id
 
@@ -168,8 +167,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     if not menu_not_drawn :  
 	ui_manager.remove_ui(ui_context_id) #Delete a previous drawn menu
-	ui_manager.remove_action_group(context_action_group)
-	del ui_context_id, context_action_group
+	del ui_context_id
+	ui_manager.ensure_update()
 
     #0. Web Context Menu
     context_action_group = Gtk.ActionGroup(name='WebMenuContextActionGroup')

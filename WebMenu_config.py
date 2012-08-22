@@ -22,20 +22,30 @@ from gi.repository import PeasGtk
 from gi.repository import Gtk
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.webmenu'
-CURRENT_VERSION = '1.0'
+CURRENT_VERSION = '2.0'
+services = {}
+services_order = []
+other_settings=[]
 
 class WMConfig(object):
+##########
+#The "__init__" function is called by the "do_activate" function in WebMenu.py when the program is launced. It saves the global variables for WebMenu_config.py
+##########
     def __init__(self):
-	global services, services_order
+	global services, services_order, other_settings
         self.settings = Gio.Settings(DCONF_DIR)
 	services = self.settings['services'] #'services' is a global variable with all the settings in it
 	services_order=self.settings['services-order']
+	other_settings=self.settings['other-settings']
 
     def get_settings(self):
         return self.settings
 
+##########
+#The "check_services_order" function is called by the "apply_settings" function in WebMenu.py. It eliminates settings errors. 
+##########
     def check_services_order(self):
-	global services, services_order
+	global services_order
 	changed=False #The services order is rewritten only if it is changed by this function
 	for service, data in services.items():
 		if service not in services_order: 
@@ -57,27 +67,124 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
     def do_create_configure_widget(self):
          return self.manage_window(Gtk.Widget)
-     
+
+##########
+#The "website_toggled_from_list" function is called whenever a checkbox of a website in the manage window is toggled. 
+##########     
     def website_toggled_from_list(self, checkbutton, path, treeview, what):
 	global services
 	(model, tree_iter) =  treeview.get_selection().get_selected()
-        service = model.get_value(tree_iter,0)
+        service = model[path][0] #Gets the service name which is in the first column of the row with the toggled checkbox
 	
-	data = list(services[service])
-	data[what+2] = not data[what+2]
-	model[path][what+2] = data[what+2]
-	services[service]= tuple(data)
-	#after assigning the new data, you should persist the services
-	self.settings['services'] = services
+	service_line = list(services[service]) #A tuple is read-only, so we need to convert it into a list to modify it
 
+	service_line[what+2] = not model[path][what+2] #The setting relative to the checkbox is updated
+	model[path][what+2] = service_line[what+2] #The checkbox is updated
+
+	services[service]= tuple(service_line) #Back to tuple
+
+	os.system("echo \"services["+service+"] now is "+str(services[service])+"\"")
+
+##########
+#The "other_settings_toggled" function is called whenever a checkbox outside the treeview is toggled. 
+##########     
     def other_settings_toggled(self, checkbutton, what):
-	options_list=self.settings['other-settings']
-	options_list[what] = checkbutton.get_active()
-	self.settings['other-settings']=options_list
+	other_settings[what] = checkbutton.get_active()
 
+##########
+#The "update_search" function simply opens a new browser window with WebMenu downloads. 
+##########     
     def update_search(self, widget, data=None):
     	webbrowser.open("https://github.com/afrancoto/WebMenu/downloads")
 
+##########
+#The "change_order" function is called when one of the two arrow buttons is clicked. 
+##########    
+    def change_order(self, widget, treeview, liststore, direction):
+	global services, services_order
+	(model, tree_iter) =  treeview.get_selection().get_selected()
+        service = model.get_value(tree_iter,0) #The selected service is the one wich is moved
+
+	moved_one_index=services_order.index(service)
+	if direction is 'down': moved_two_index=moved_one_index + 1
+	if direction is 'up': moved_two_index=moved_one_index - 1
+	
+	services_order[moved_one_index]=services_order[moved_two_index] #It swaps the variables
+	services_order[moved_two_index]=service
+
+	liststore.clear() #And updates the list
+	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
+	treeview.set_cursor(moved_two_index)
+
+##########
+#The "new_service_add" function is called from the "new_service_window". 
+##########  
+    def new_service_add(self, widget, name, album, artist, treeview, liststore):
+	global services, services_order
+        service=name.get_text() #Gets the data from the textboxes
+	album_URL=album.get_text()
+	artist_URL=artist.get_text()
+
+	if (album_URL[:7] != "http://") and (album_URL[:8] != "https://") and (album_URL != ""): album_URL="http://"+album_URL #Adds the http:// if it's not in the URL
+	if (artist_URL[:7] != "http://") and (artist_URL[:8] != "https://") and (artist_URL != ""): artist_URL="http://"+artist_URL
+	
+	if (service is not '') and not((album_URL is '') and (artist_URL is '')): #If the name is empty or both the URLs are empty, nothing is done
+        	services[service] = ('', album_URL, artist_URL , True, True) #Writes the new service in the global variables
+		services_order.append(service)
+
+	liststore.clear() #And updates the list
+	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
+	treeview.set_cursor(len(services_order)-1)
+        self.window.destroy()
+
+##########
+#The "delete_service" function is called by the "delete_service" button. 
+##########  
+    def delete_service(self, widget, treeview, liststore):
+	global services, services_order
+	(model, tree_iter) =  treeview.get_selection().get_selected()
+        service = model.get_value(tree_iter,0) #The selected service is the one wich is deleted
+
+	question = _("Are you sure you want to delete '"+service+"' from WebMenu?") #A confirmation is required
+    	dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question) 
+    	response = dialog.run()
+	os.system("echo "+str(response))
+	dialog.destroy()
+
+	if response == Gtk.ResponseType.YES:
+	    del services[service]
+	    services_order.remove(service)  #Deletes the service from the global variables
+	    
+	    liststore.clear() #And updates the list
+	    for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
+
+##########
+#The "reset_to_default" function is called by the "reset_to_default" button. 
+##########  
+    def reset_to_default(self, widget, liststore):
+	#TODO: Update the other-settings checkboxes when settings are resetted 
+	global services, services_order, other_settings
+
+	question = _("Are you sure you want to restore the default services and options?\n All your changes will be lost.")  #A confirmation is required
+    	dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question) 
+    	response = dialog.run()
+	os.system("echo "+str(response))
+	dialog.destroy()
+
+	if response == Gtk.ResponseType.YES:
+		self.settings.reset('services') #Settings are resetted, that's the only function that doesn't need "apply_settings"
+		self.settings.reset('services-order')
+		self.settings.reset('other-settings')
+		services = self.settings['services'] #Global variables are updated
+		services_order=self.settings['services-order']
+		other_settings=self.settings['other-settings']
+	
+		liststore.clear() #And the list is updated
+        	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
+
+##########
+#The "manage_window" function draws the main settings window. 
+##########  
     def manage_window(self, widget, data=None):
 	self.window = Gtk.Window()
 	self.window.set_default_size(1000,400)
@@ -131,17 +238,17 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	other_settings_hbox=Gtk.HBox()
 	
 	all_album_check = Gtk.CheckButton("'All' in Album submenu") #The 'All'-album checkbox
-        all_album_check.set_active(self.settings['other-settings'][1])
+        all_album_check.set_active(other_settings[1])
 	all_album_check.connect("toggled", self.other_settings_toggled, 1) #The last argument, 1, stands for "Album"   
 	other_settings_hbox.pack_start(all_album_check, False, False, 10)
 
 	all_artist_check = Gtk.CheckButton("'All' in Artist submenu") #The 'All'-artist checkbox
-        all_artist_check.set_active(self.settings['other-settings'][2])
+        all_artist_check.set_active(other_settings[2])
 	all_artist_check.connect("toggled", self.other_settings_toggled, 2) #The last argument, 1, stands for "Album"   
 	other_settings_hbox.pack_start(all_artist_check, False, False, 10)
 
 	options_check = Gtk.CheckButton("'Options' menu item") #The 'Options' checkbox
-        options_check.set_active(self.settings['other-settings'][0])
+        options_check.set_active(other_settings[0])
 	options_check.connect("toggled", self.other_settings_toggled, 0) #The last argument, 2, stands for the "Options" item
 	other_settings_hbox.pack_end(options_check, False, False, 10)
 	vbox.pack_start(other_settings_hbox, False, True, 5)
@@ -167,9 +274,9 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         reset_button.connect("clicked", self.reset_to_default, liststore)
         hbox.pack_start(reset_button, False, False, 10)
 
-	done_button = Gtk.Button(stock=Gtk.STOCK_OK)
+	done_button = Gtk.Button(stock=Gtk.STOCK_APPLY)
 	hbox.pack_end(done_button, False, False, 0)
-	done_button.connect_object("clicked", Gtk.Widget.destroy, self.window)
+	done_button.connect_object("clicked", self.apply_settings, self.window)
 
 	update_button = Gtk.Button("Updates? (v."+CURRENT_VERSION+")")
 	update_button.connect("clicked", self.update_search)
@@ -179,26 +286,10 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	self.window.add(vbox)
 	self.window.show_all()
 	return
- 
-    def change_order(self, widget, treeview, liststore, direction):
-	#TODO: Need to update the menus correctly
-	global services, services_order
-	(model, tree_iter) =  treeview.get_selection().get_selected()
-        service = model.get_value(tree_iter,0)
 
-	moved_one_index=services_order.index(service)
-	if direction is 'down': moved_two_index=moved_one_index + 1
-	if direction is 'up': moved_two_index=moved_one_index - 1
-	
-	services_order[moved_one_index]=services_order[moved_two_index]
-	services_order[moved_two_index]=service
-	self.settings['services-order']=services_order
-
-	liststore.clear()
-	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
-	treeview.set_cursor(moved_two_index)
-	return
-
+##########
+#The "new_service_window" function draws the window to add a new service. 
+##########  
     def new_service_window(self, widget, treeview, liststore):
 	self.window = Gtk.Window()
 
@@ -266,62 +357,12 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	self.window.show_all()
 	return
 
-    def new_service_add(self, widget, name, album, artist, treeview, liststore):
-	global services, services_order
-        service=name.get_text()
-	album_URL=album.get_text()
-	if (album_URL[:7] != "http://") and (album_URL[:8] != "https://") and (album_URL != ""): album_URL="http://"+album_URL #Adds the http:// if it's not in the URL
-	artist_URL=artist.get_text()
-	if (artist_URL[:7] != "http://") and (artist_URL[:8] != "https://") and (artist_URL != ""): artist_URL="http://"+artist_URL #Adds the http:// if it's not in the URL
-	
-	if service is not '':
-        	services[service] = ('', album_URL, artist_URL , True, True) #Gets the new service
-		services_order.append(service)
-	
-	        self.settings['services'] = services #Writes the new service in dconf
-        	self.settings['services-order']=services_order
+##########
+#The "apply_settings" function is called by the "apply" button in the manage window, it's the only function that writes in dconf ("reset_to_default" excluded)  
+########## 
+    def apply_settings(self, widget, data=None):
+	self.settings['services']=services
+	self.settings['services-order']=services_order
+	self.settings['other-settings']=other_settings
+	Gtk.Widget.destroy(self.window)
 
-	liststore.clear()
-	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
-	treeview.set_cursor(len(services_order)-1)
-        self.window.destroy()
-
-    def delete_service(self, widget, treeview, liststore):
-	global services, services_order
-	(model, tree_iter) =  treeview.get_selection().get_selected()
-        service = model.get_value(tree_iter,0)
-
-	question = _("Are you sure you want to delete '"+service+"' from WebMenu?")
-    	dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question) 
-    	response = dialog.run()
-	os.system("echo "+str(response))
-	dialog.destroy()
-
-	if response == Gtk.ResponseType.YES:
-	    del services[service]
-	    services_order.remove(service)
-	    self.settings['services-order']=services_order
-	    self.settings['services'] = services
-	    
-	    liststore.clear()
-	    for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
-
-    def reset_to_default(self, widget, liststore):
-	#TODO: Update the other-settings checkboxes when settings are resetted 
-	global services, services_order
-
-	question = _("Are you sure you want to restore the default services and options?\n All your changes will be lost.")
-    	dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question) 
-    	response = dialog.run()
-	os.system("echo "+str(response))
-	dialog.destroy()
-
-	if response == Gtk.ResponseType.YES:
-		self.settings.reset('services')
-		self.settings.reset('services-order')
-		self.settings.reset('other-settings')
-		services = self.settings['services']
-		services_order=self.settings['services-order']
-	
-		liststore.clear()
-        	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
