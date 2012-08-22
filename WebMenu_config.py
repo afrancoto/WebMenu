@@ -56,80 +56,8 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         self.settings = Gio.Settings(DCONF_DIR)
 
     def do_create_configure_widget(self):
-        dialog = Gtk.VBox()
-    	
-	vbox=Gtk.VBox(False, 0)
-	vbox.set_margin_left(15)
-	vbox.set_margin_right(15)
-	hbox=Gtk.HBox()
-
-	albumvbox = Gtk.VBox()
-	albumlabel = Gtk.Label("<b>Album Submenu:</b>", use_markup=True) #Frome here: 'Album' vertical box    
-	albumvbox.pack_start(albumlabel, False, False, 5)
-	albumvbox.set_margin_right(15)
-        for service in services_order:
-	    if services[service][1] is not '': #If the album URL is empty does not display the option
-		    check = Gtk.CheckButton(service)
-		    check.set_active(services[service][3])
-		    check.connect("toggled", self.website_toggled, service, 1)#The last argument, 1, stands for "Album"   
-		    albumvbox.pack_start(check, False, False, 0)
-	
-	albumhseparator = Gtk.HSeparator()
-	albumvbox.pack_start(albumhseparator, False, False, 0)
-	check = Gtk.CheckButton("All") #The 'All'-album checkbox
-        check.set_active(self.settings['other-settings'][1])
-	check.connect("toggled", self.other_settings_toggled, 1) #The last argument, 1, stands for "Album"   
-	albumvbox.pack_start(check, False, False, 0)
-	
-        hbox.pack_start(albumvbox, False, False, 0)
-
-	artistlabel = Gtk.Label("<b>Artist Submenu:</b>", use_markup=True) #Frome here: 'Artist' vertical box      
-	artistvbox = Gtk.VBox()
-	artistvbox.pack_start(artistlabel, False, False, 5)
-        artistvbox.set_margin_left(15)
-        for service in services_order:
-	    if services[service][2] is not '': #If the artist URL is empty does not display the option
-		    check = Gtk.CheckButton(service)
-		    check.set_active(services[service][4])
-	 	    check.connect("toggled", self.website_toggled, service, 2) #The last argument, 2, stands for "Artist"  
-		    artistvbox.pack_start(check, False, False, 0)
-
-	artisthseparator = Gtk.HSeparator()
-	artistvbox.pack_start(artisthseparator, False, False, 0)
-	check = Gtk.CheckButton("All") #The 'All'-artist checkbox
-        check.set_active(self.settings['other-settings'][2])
-	check.connect("toggled", self.other_settings_toggled, 2) #The last argument, 2, stands for "Album"   
-	artistvbox.pack_start(check, False, False, 0)
-       
-        hbox.pack_start(artistvbox, False, False, 0)
-	vbox.pack_start(hbox, False, False, 0)
-
-	check = Gtk.CheckButton("Show the 'Options' item in the Web Menu") #The 'Options' checkbox
-        check.set_active(self.settings['other-settings'][0])
-	check.connect("toggled", self.other_settings_toggled, 0) #The last argument, 2, stands for the "Options" item
-	vbox.pack_start(check, False, False, 10)
-	
-	manage_button = Gtk.Button("Manage services") #crea il pulsante
-	manage_button.connect("clicked", self.manage_window)
-	vbox.pack_start(manage_button, False, False, 0)
-
-	update_button = Gtk.Button("Look for updates (Current Version: "+CURRENT_VERSION+")") #crea il pulsante
-	update_button.connect("clicked", self.update_search)
-	vbox.pack_start(update_button, False, False, 0)
-
-        dialog.pack_start(vbox, True, False, 0)
-        dialog.show_all()
-        
-        return dialog
+         return self.manage_window(Gtk.Widget)
      
-    def website_toggled(self, checkbutton, service, what):
-	global services
-	data = list(services[service])
-	data[what+2] = checkbutton.get_active()
-	services[service]= tuple(data)
-	#after asigning the new data, you should persist the services
-	self.settings['services'] = services
-
     def website_toggled_from_list(self, checkbutton, path, treeview, what):
 	global services
 	(model, tree_iter) =  treeview.get_selection().get_selected()
@@ -139,7 +67,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	data[what+2] = not data[what+2]
 	model[path][what+2] = data[what+2]
 	services[service]= tuple(data)
-	#after asigning the new data, you should persist the services
+	#after assigning the new data, you should persist the services
 	self.settings['services'] = services
 
     def other_settings_toggled(self, checkbutton, what):
@@ -159,7 +87,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	vbox=Gtk.VBox()
 	treeview = Gtk.TreeView(liststore)
 	treeview.set_cursor(0)
-	#treeview.set_mode(Gtk.SELECTION_SINGLE)
 
 	rendererText = Gtk.CellRendererText()
         column_0 = Gtk.TreeViewColumn("Service", rendererText, text=0)
@@ -236,9 +163,17 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         delete_button.connect("clicked", self.delete_service, treeview, liststore)
         hbox.pack_start(delete_button, False, False, 0)
 
+        reset_button = Gtk.Button('Reset to default')
+        reset_button.connect("clicked", self.reset_to_default, liststore)
+        hbox.pack_start(reset_button, False, False, 10)
+
 	done_button = Gtk.Button(stock=Gtk.STOCK_OK)
 	hbox.pack_end(done_button, False, False, 0)
 	done_button.connect_object("clicked", Gtk.Widget.destroy, self.window)
+
+	update_button = Gtk.Button("Updates? (v."+CURRENT_VERSION+")")
+	update_button.connect("clicked", self.update_search)
+        hbox.pack_end(update_button, False, False, 0)
 
 	vbox.pack_start(hbox, False, True, 5)
 	self.window.add(vbox)
@@ -335,9 +270,9 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	global services, services_order
         service=name.get_text()
 	album_URL=album.get_text()
-	if (album_URL[:7] != "http://") and (album_URL[:8] != "https://"): album_URL="http://"+album_URL #Adds the http:// if it's not in the URL
+	if (album_URL[:7] != "http://") and (album_URL[:8] != "https://") and (album_URL != ""): album_URL="http://"+album_URL #Adds the http:// if it's not in the URL
 	artist_URL=artist.get_text()
-	if (artist_URL[:7] != "http://") and (artist_URL[:8] != "https://"): artist_URL="http://"+artist_URL #Adds the http:// if it's not in the URL
+	if (artist_URL[:7] != "http://") and (artist_URL[:8] != "https://") and (artist_URL != ""): artist_URL="http://"+artist_URL #Adds the http:// if it's not in the URL
 	
 	if service is not '':
         	services[service] = ('', album_URL, artist_URL , True, True) #Gets the new service
@@ -370,4 +305,23 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	    
 	    liststore.clear()
 	    for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
-	    #treeview.set_cursor(deleted_one_index)
+
+    def reset_to_default(self, widget, liststore):
+	#TODO: Update the other-settings checkboxes when settings are resetted 
+	global services, services_order
+
+	question = _("Are you sure you want to restore the default services and options?\n All your changes will be lost.")
+    	dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question) 
+    	response = dialog.run()
+	os.system("echo "+str(response))
+	dialog.destroy()
+
+	if response == Gtk.ResponseType.YES:
+		self.settings.reset('services')
+		self.settings.reset('services-order')
+		self.settings.reset('other-settings')
+		services = self.settings['services']
+		services_order=self.settings['services-order']
+	
+		liststore.clear()
+        	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])

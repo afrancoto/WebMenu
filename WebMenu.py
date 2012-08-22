@@ -78,13 +78,18 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "draw_menu" function creates the 'Web' menu and associates every entry to its specific function
 ##########
 
-  def draw_menu(self, shell, key):
+  def draw_menu(self, shell):
     #global services, services_order, other_settings
     global action_group
     global ui_id
 
     ui_manager = shell.props.ui_manager
-    if key is not 'firsttime': 
+    menu_not_drawn=False #Usually the function is called by apply_settings, so the menu is already drawn
+
+    try: ui_id
+    except NameError: menu_not_drawn=True #If the ui_context_id does not exist, the menu is not yet drawn, so it is not deleted
+
+    if not menu_not_drawn :
 	ui_manager.remove_ui(ui_id) #Delete a previous drawn menu
 	ui_manager.remove_action_group(action_group)
 	del ui_id, action_group
@@ -150,13 +155,18 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
 #The "draw_context_menu" function creates the entries in the context menu and associates them to their specific function.
 ##########
-  def draw_context_menu(self, shell, key):
+  def draw_context_menu(self, shell):
     #global services, services_order, other_settings
     global context_action_group
     global ui_context_id
 
     ui_manager = shell.props.ui_manager
-    if key is not 'firsttime':  
+    menu_not_drawn=False #Usually the function is called by apply_settings, so the menu is already drawn
+
+    try: ui_context_id
+    except NameError: menu_not_drawn=True #If the ui_context_id does not exist, the menu is not yet drawn, so it is not deleted
+
+    if not menu_not_drawn :  
 	ui_manager.remove_ui(ui_context_id) #Delete a previous drawn menu
 	ui_manager.remove_action_group(context_action_group)
 	del ui_context_id, context_action_group
@@ -218,8 +228,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     config.check_services_order()
     
-    self.draw_menu(shell, key)#Redraws the menus
-    self.draw_context_menu(shell, key)
+    self.draw_menu(shell)#Redraws the menus
+    self.draw_context_menu(shell)
 	
     os.system("echo apply_settings: "+ key)
 
@@ -266,8 +276,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     services_order = self.settings['services-order'] #'services-order' is a global variable that keeps the right order for the menu items
     other_settings = self.settings['other-settings'] #'other-settings' is an array of booleans: ['Options' item, 'All' item in album menu, 'All' item in artist menu]
 
-    self.draw_menu(shell, 'firsttime') #Calls "draw_menu"
-    self.draw_context_menu(shell, 'firsttime') #Calls "draw_context_menu"
+    self.draw_menu(shell) #Calls "draw_menu"
+    self.draw_context_menu(shell) #Calls "draw_context_menu"
 
     self.apply_settings('oldsettings', 'all' , shell, config) #Calls "apply_settings"
     self.settings.connect('changed', self.apply_settings, shell, config) #Connects a change in the settings menus to "apply_settings"
@@ -350,8 +360,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "open_options" function opens teh configuration window
 ##########
   def open_options(self, event, shell):
-#	WMConfigDialog.do_create_configure_widget
-	return
+	config_dialog = WMConfigDialog()
+	WMConfigDialog.manage_window(config_dialog, None)
 
 ##########
 #The "song_changed" function controls if no song is playing. If it is so, the 'Web' menu options are disabled.
