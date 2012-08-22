@@ -114,12 +114,12 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         column_3 = Gtk.TreeViewColumn("Album URL", rendererText, text=1)
 	column_3.set_resizable(True)
 	column_3.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        column_3.set_fixed_width(450)
+        column_3.set_fixed_width(400)
         treeview.append_column(column_3)
         column_4 = Gtk.TreeViewColumn("Artist URL", rendererText, text=2) 
 	column_4.set_resizable(True)
 	column_4.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        column_4.set_fixed_width(450)
+        column_4.set_fixed_width(400)
         treeview.append_column(column_4)
 	
 
