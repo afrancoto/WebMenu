@@ -4,7 +4,7 @@ RHYTHMBOX Web Menu 2.0 (Work in progress)
 TO DO
 =====
 - Manage window
-  - Remove Waring on draw_menu
+  - Remove Warning on draw_menu
   - Remove error on call from Rhythmbox Plugins window [DONE]
   - Bug: Manage window does not close after Add service + Apply [DONE]
   - Reorder the menus in the settings[DONE] -> Redraw the menus [DONE]
@@ -20,3 +20,5 @@ TO DO
 
 - 'Options' menu item
   - Make it work  [DONE]
+
+- Install.sh [DONE]
