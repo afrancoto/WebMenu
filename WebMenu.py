@@ -83,17 +83,14 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     global action_group
     global ui_id
 
-    ui_manager = shell.props.ui_manager
     menu_not_drawn=False #Usually the function is called by apply_settings, so the menu is already drawn
 
     try: ui_id
     except NameError: menu_not_drawn=True #If the ui_context_id does not exist, the menu is not yet drawn, so it is not deleted
 
-    os.system("echo draw_menu: "+ str(not menu_not_drawn))
     if not menu_not_drawn :
 	ui_manager.remove_ui(ui_id) #Delete a previous drawn menu
 	del ui_id
-    os.system("echo \"it's him! Kill it with fire!!!\"")
 	ui_manager.ensure_update()	
 
     #0. Web Menu
@@ -160,7 +157,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     global context_action_group
     global ui_context_id
 
-    ui_manager = shell.props.ui_manager
     menu_not_drawn=False #Usually the function is called by apply_settings, so the menu is already drawn
 
     try: ui_context_id
@@ -235,29 +231,29 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     for path in paths:
 	for service, data in services.items():
 		menu_option=path+"/AlbumMenu/AL_"+service  #Hides the non-active options in the "Album" submenu
-		menu_option_widget=shell.props.ui_manager.get_widget(menu_option)
+		menu_option_widget=ui_manager.get_widget(menu_option)
 		if (services[service][1] is not ''):# and (menu_option_widget is not None):
 			if services[service][3]: shell.props.ui_manager.get_widget(menu_option).show()
-			else: shell.props.ui_manager.get_widget(menu_option).hide()
+			else: ui_manager.get_widget(menu_option).hide()
 
 		menu_option=path+"/ArtistMenu/AR_"+service  #Hides the non-active options in the "Artist" submenu
 		if (services[service][2] is not ''):# and (menu_option_widget is not None):
 			if services[service][4]:  shell.props.ui_manager.get_widget(menu_option).show()
-			else: shell.props.ui_manager.get_widget(menu_option).hide()
+			else: ui_manager.get_widget(menu_option).hide()
 
 
 	menu_option=path+"/AlbumMenu/AL_all"  #Hides/shows the 'All' option in the "Album" submenu	
-	if other_settings[1]: shell.props.ui_manager.get_widget(menu_option).show()
-	else: shell.props.ui_manager.get_widget(menu_option).hide()
+	if other_settings[1]: ui_manager.get_widget(menu_option).show()
+	else: ui_manager.get_widget(menu_option).hide()
 
 	menu_option=path+"/ArtistMenu/AR_all"  #Hides/shows the 'All' option in the "Artist" submenu	
-	if other_settings[2]: shell.props.ui_manager.get_widget(menu_option).show()
-	else: shell.props.ui_manager.get_widget(menu_option).hide()
+	if other_settings[2]: ui_manager.get_widget(menu_option).show()
+	else: ui_manager.get_widget(menu_option).hide()
 
-    if other_settings[0]: shell.props.ui_manager.get_widget("/MenuBar/WebMenu/Optionsitem").show()
-    else: shell.props.ui_manager.get_widget("/MenuBar/WebMenu/Optionsitem").hide()
+    if other_settings[0]: ui_manager.get_widget("/MenuBar/WebMenu/Optionsitem").show()
+    else: ui_manager.get_widget("/MenuBar/WebMenu/Optionsitem").hide()
 
-    shell.props.ui_manager.ensure_update()
+    ui_manager.ensure_update()
 
 ##########
 #The "do_activate" function is called when Rhythmbox is loaded
@@ -269,8 +265,10 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     # 'service_name' : ('song_engine_url','album_engine_url','artist_engine_url', enabled_in_album_submenu, enabled_in_artist_submenu)
 
     global services, services_order, other_settings
+    global ui_manager
 
     shell = self.object
+    ui_manager = shell.props.ui_manager
     config = WMConfig()
     self.settings = config.get_settings()
     services = self.settings['services'] #'services' is a global variable with all the settings in it
@@ -295,7 +293,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     global action_group, context_action_group
 
     shell = self.object
-    ui_manager = shell.props.ui_manager
     ui_manager.remove_ui(ui_id)
     ui_manager.remove_action_group(action_group)
     del ui_id, action_group
@@ -371,13 +368,13 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     self.playing_entry = s_props.shell_player.get_playing_entry() 
     now_is_playing=self.playing_entry is not None #current playing song==None --> False
 
-    s_props.ui_manager.get_widget("/MenuBar/WebMenu/YTitem").set_sensitive(now_is_playing)  #Disable the YouTube item
+    ui_manager.get_widget("/MenuBar/WebMenu/YTitem").set_sensitive(now_is_playing)  #Disable the YouTube item
     for service, data in services.items():
 	if services[service][1] is not '':
 		menu_option="/MenuBar/WebMenu/AlbumMenu/AL_"+service  #Disable all the options in the "Album" submenu
-		s_props.ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
+		ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
 	if services[service][2] is not '':
 		menu_option="/MenuBar/WebMenu/ArtistMenu/AR_"+service #Disable all the options in the "Artist" submenu
-		s_props.ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
-    s_props.ui_manager.get_widget("/MenuBar/WebMenu/AlbumMenu/AL_all").set_sensitive(now_is_playing)  #Disable the Album/All item
-    s_props.ui_manager.get_widget("/MenuBar/WebMenu/ArtistMenu/AR_all").set_sensitive(now_is_playing)  #Disable the Artist/All item
+		ui_manager.get_widget(menu_option).set_sensitive(now_is_playing)
+    ui_manager.get_widget("/MenuBar/WebMenu/AlbumMenu/AL_all").set_sensitive(now_is_playing)  #Disable the Album/All item
+    ui_manager.get_widget("/MenuBar/WebMenu/ArtistMenu/AR_all").set_sensitive(now_is_playing)  #Disable the Artist/All item

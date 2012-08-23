@@ -330,6 +330,9 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 	vbox.pack_start(hbox2, False, True, 5)
 
+	remember_label=Gtk.Label("<b>Remember to apply your changes!</b>", use_markup=True)
+	vbox.pack_start(remember_label, False, False, 10)
+
 	treeview.connect('cursor-changed', self.row_changed, label_album_URL, label_artist_URL)
 	vbox.connect("destroy", self.on_manage_destroy)
 	return vbox
@@ -417,6 +420,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 	#button = Gtk.Button(stock=Gtk.STOCK_HELP) #Future development
 	#bbox.add(button)
+
 	vbox.pack_start(bbox, False, False, 0)
         self.new_service_window.add(vbox)
 	self.new_service_window.show_all()
