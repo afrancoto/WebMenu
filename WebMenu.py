@@ -93,8 +93,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     if not menu_not_drawn :
 	ui_manager.remove_ui(ui_id) #Delete a previous drawn menu
 	del ui_id
-	ui_manager.ensure_update()
-    os.system("echo \"it's him! Kill it with fire!!!\"")	
+    os.system("echo \"it's him! Kill it with fire!!!\"")
+	ui_manager.ensure_update()	
 
     #0. Web Menu
     action_group = Gtk.ActionGroup(name='WebMenuActionGroup')

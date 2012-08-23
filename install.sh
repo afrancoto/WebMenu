@@ -66,7 +66,7 @@ SCRIPT_PATH=${0%`basename "$0"`}
 
 #deletes old files
 echo Deleting old files
-sudo rm "${GLIB_DIR}${GLIB_SCHEME}" &>/dev/null
+#sudo rm "${GLIB_DIR}${GLIB_SCHEME}" &>/dev/null
 sudo rm -r "/home/${USER}/.local/share/rhythmbox/plugins/WebMenu" &>/dev/null
 sudo rm -r "/usr/lib/rhythmbox/plugins/WebMenu" &>/dev/null
 
