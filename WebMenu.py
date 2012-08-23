@@ -149,7 +149,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     action_group.add_action (options_action)
 
     ui = web_menu_item % (ui_album, ui_artist) #Adds ui_album and ui_artist to the webmenu
-    #os.system('echo "'+ui+'"')
     ui_manager.insert_action_group(action_group)
     ui_id = ui_manager.add_ui_from_string(ui)
     ui_manager.ensure_update()
@@ -231,8 +230,6 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     
     self.draw_menu(shell)#Redraws the menus
     self.draw_context_menu(shell)
-	
-    os.system("echo apply_settings: "+ key)
 
     paths=["/MenuBar/WebMenu", "/QueuePlaylistViewPopup/PluginPlaceholder", "/BrowserSourceViewPopup/PluginPlaceholder", "/PlaylistViewPopup/PluginPlaceholder", "/PodcastViewPopup/PluginPlaceholder"] #Settings must be applied to the Web Menu and to every context menu
     for path in paths:

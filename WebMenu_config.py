@@ -83,8 +83,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 	services[service]= tuple(service_line) #Back to tuple
 
-	os.system("echo \"services["+service+"] now is "+str(services[service])+"\"")
-
 ##########
 #The "other_settings_toggled" function is called whenever a checkbox outside the treeview is toggled. 
 ##########     
@@ -148,7 +146,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	question = _("Are you sure you want to delete '"+service+"' from WebMenu?") #A confirmation is required
     	dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question) 
     	response = dialog.run()
-	os.system("echo "+str(response))
 	dialog.destroy()
 
 	if response == Gtk.ResponseType.YES:
@@ -168,7 +165,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	question = _("Are you sure you want to restore the default services and options?\n All your changes will be lost.")  #A confirmation is required
     	dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question) 
     	response = dialog.run()
-	os.system("echo "+str(response))
 	dialog.destroy()
 
 	if response == Gtk.ResponseType.YES:
@@ -183,11 +179,23 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
 
 ##########
+#The "row_changed" function adds a tooltip for each row with the URLs. 
+##########  
+    def row_changed(self, treeview, label_album_URL, label_artist_URL):
+	(path, column)=treeview.get_cursor()
+	(model, tree_iter) =  treeview.get_selection().get_selected()
+        service = model[path][0] #Gets the service name which is in the first column of the row with the toggled checkbox
+
+	label_album_URL.set_text(services[service][1])
+	label_artist_URL.set_text(services[service][2])
+	label_artist_URL.set_use_markup(True)
+
+##########
 #The "manage_window" function draws the main settings window. 
 ##########  
     def manage_window(self, widget, data=None):
 	self.window = Gtk.Window()
-	self.window.set_default_size(1000,400)
+
 	liststore = Gtk.ListStore(str, str, str, bool, bool)
 	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
 	
@@ -199,7 +207,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         column_0 = Gtk.TreeViewColumn("Service", rendererText, text=0)
 	column_0.set_resizable(True)
 	column_0.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        column_0.set_fixed_width(100)
+        column_0.set_fixed_width(200)
         treeview.append_column(column_0)
 
 	rendererAlbumCheck = Gtk.CellRendererToggle()
@@ -207,7 +215,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	rendererAlbumCheck.connect("toggled", self.website_toggled_from_list, treeview, 1)
 	column_1 = Gtk.TreeViewColumn("Album", rendererAlbumCheck, active=3)
 	column_1.set_resizable(True)
-
+      	column_1.set_fixed_width(150)
         treeview.append_column(column_1)
 
 	rendererArtistCheck = Gtk.CellRendererToggle()
@@ -215,74 +223,103 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	rendererArtistCheck.connect("toggled", self.website_toggled_from_list, treeview, 2)
 	column_2 = Gtk.TreeViewColumn("Artist", rendererArtistCheck, active=4)
 	column_2.set_resizable(True)
-        treeview.append_column(column_2)
-
-
-        column_3 = Gtk.TreeViewColumn("Album URL", rendererText, text=1)
-	column_3.set_resizable(True)
-	column_3.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        column_3.set_fixed_width(400)
-        treeview.append_column(column_3)
-        column_4 = Gtk.TreeViewColumn("Artist URL", rendererText, text=2) 
-	column_4.set_resizable(True)
-	column_4.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        column_4.set_fixed_width(400)
-        treeview.append_column(column_4)
-	
+        column_2.set_fixed_width(150)
+        treeview.append_column(column_2)	
 
 	scroll = Gtk.ScrolledWindow()
     	scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
     	scroll.add(treeview)
+	scroll.set_min_content_width(300)
+	scroll.set_min_content_height(300)
 	vbox.pack_start(scroll, True, True, 5)
-        
-	other_settings_hbox=Gtk.HBox()
+
+	frame=Gtk.Frame(label="URLs:")
 	
-	all_album_check = Gtk.CheckButton("'All' in Album submenu") #The 'All'-album checkbox
+	hbox_line1=Gtk.HBox()
+	label_album=Gtk.Label("<b>Album:</b> ", use_markup=True)
+	label_album.set_alignment(0,0)
+	hbox_line1.pack_start(label_album, False, True, 0)    
+	label_album_URL=Gtk.Label(services[liststore[0][0]][1])
+	label_album_URL.set_justify(Gtk.Justification.LEFT)
+	label_album_URL.set_alignment(0,0)
+	hbox_line1.pack_start(label_album_URL, False, True, 0)  
+
+	hbox_line2=Gtk.HBox()
+	label_artist=Gtk.Label("<b>Artist:</b> ", use_markup=True)
+	label_artist.set_alignment(0,0)
+	hbox_line2.pack_start(label_artist, False, True, 0)    
+	label_artist_URL=Gtk.Label(services[liststore[0][0]][2])
+	label_artist_URL.set_justify(Gtk.Justification.LEFT)
+	label_artist_URL.set_alignment(0,0)
+	hbox_line2.pack_start(label_artist_URL, False, True, 0)   
+
+	vbox_in_frame=Gtk.VBox()
+	vbox_in_frame.pack_start(hbox_line1, False, True, 0)
+	vbox_in_frame.pack_start(hbox_line2, False, True, 0)
+
+	scroll_urls = Gtk.ScrolledWindow()
+    	scroll_urls .set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+    	scroll_urls.add_with_viewport(vbox_in_frame)
+	scroll_urls.set_min_content_width(90)
+	#scroll_urls.set_min_content_height(60)
+	frame.add(scroll_urls)
+	hbox_out_frame=Gtk.HBox()
+	hbox_out_frame.pack_start(frame, True, True, 5)    
+	vbox.pack_start(hbox_out_frame, False, True, 5)    
+
+	other_settings_hbox=Gtk.HBox()
+
+	all_album_check = Gtk.CheckButton("Album/All") #The 'All'-album checkbox
         all_album_check.set_active(other_settings[1])
 	all_album_check.connect("toggled", self.other_settings_toggled, 1) #The last argument, 1, stands for "Album"   
-	other_settings_hbox.pack_start(all_album_check, False, False, 10)
+	other_settings_hbox.pack_start(all_album_check, False, False, 0)
 
-	all_artist_check = Gtk.CheckButton("'All' in Artist submenu") #The 'All'-artist checkbox
+	all_artist_check = Gtk.CheckButton("Artist/All") #The 'All'-artist checkbox
         all_artist_check.set_active(other_settings[2])
 	all_artist_check.connect("toggled", self.other_settings_toggled, 2) #The last argument, 1, stands for "Album"   
 	other_settings_hbox.pack_start(all_artist_check, False, False, 10)
 
-	options_check = Gtk.CheckButton("'Options' menu item") #The 'Options' checkbox
+	options_check = Gtk.CheckButton("Web/Options") #The 'Options' checkbox
         options_check.set_active(other_settings[0])
 	options_check.connect("toggled", self.other_settings_toggled, 0) #The last argument, 2, stands for the "Options" item
-	other_settings_hbox.pack_end(options_check, False, False, 10)
+	other_settings_hbox.pack_start(options_check, False, False, 10)
+
 	vbox.pack_start(other_settings_hbox, False, True, 5)
 
-	hbox=Gtk.HBox()
+	hbox1=Gtk.HBox()
         button_up = Gtk.Button(u'\u2191')
         button_up.connect("clicked", self.change_order, treeview, liststore, 'up')
-        hbox.pack_start(button_up, False, False, 0)
+        hbox1.pack_start(button_up, False, True, 0)
             
         button_down = Gtk.Button(u'\u2193')
         button_down.connect("clicked", self.change_order, treeview, liststore, 'down')
-        hbox.pack_start(button_down, False, False, 0)
+        hbox1.pack_start(button_down, False, True, 0)
 
-	new_button = Gtk.Button("Add a service")
+	new_button = Gtk.Button("Add Service")
 	new_button.connect("clicked", self.new_service_window, treeview, liststore)
-	hbox.pack_start(new_button, False, False, 0)
+	hbox1.pack_start(new_button, False, True, 0)
 
-        delete_button = Gtk.Button('Delete service')
+        delete_button = Gtk.Button('Delete Service')
         delete_button.connect("clicked", self.delete_service, treeview, liststore)
-        hbox.pack_start(delete_button, False, False, 0)
+        hbox1.pack_start(delete_button, False, True, 0)
 
         reset_button = Gtk.Button('Reset to default')
         reset_button.connect("clicked", self.reset_to_default, liststore)
-        hbox.pack_start(reset_button, False, False, 10)
+        hbox1.pack_end(reset_button, False, False, 0)
+	vbox.pack_start(hbox1, False, True, 5)
 
+	hbox2=Gtk.HBox()
 	done_button = Gtk.Button(stock=Gtk.STOCK_APPLY)
-	hbox.pack_end(done_button, False, False, 0)
+	hbox2.pack_end(done_button, False, False, 0)
 	done_button.connect_object("clicked", self.apply_settings, self.window)
 
 	update_button = Gtk.Button("Updates? (v."+CURRENT_VERSION+")")
 	update_button.connect("clicked", self.update_search)
-        hbox.pack_end(update_button, False, False, 0)
+        hbox2.pack_start(update_button, False, False, 0)
 
-	vbox.pack_start(hbox, False, True, 5)
+	vbox.pack_start(hbox2, False, True, 5)
+
+	treeview.connect('cursor-changed', self.row_changed, label_album_URL, label_artist_URL)
 	self.window.add(vbox)
 	self.window.show_all()
 	return
