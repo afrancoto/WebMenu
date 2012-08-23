@@ -235,14 +235,16 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     for path in paths:
 	for service, data in services.items():
 		menu_option=path+"/AlbumMenu/AL_"+service  #Hides the non-active options in the "Album" submenu
-		if services[service][1] is not '':
+		menu_option_widget=shell.props.ui_manager.get_widget(menu_option)
+		if (services[service][1] is not ''):# and (menu_option_widget is not None):
 			if services[service][3]: shell.props.ui_manager.get_widget(menu_option).show()
 			else: shell.props.ui_manager.get_widget(menu_option).hide()
 
 		menu_option=path+"/ArtistMenu/AR_"+service  #Hides the non-active options in the "Artist" submenu
-		if services[service][2] is not '':
-			if services[service][4]: shell.props.ui_manager.get_widget(menu_option).show()
+		if (services[service][2] is not ''):# and (menu_option_widget is not None):
+			if services[service][4]:  shell.props.ui_manager.get_widget(menu_option).show()
 			else: shell.props.ui_manager.get_widget(menu_option).hide()
+
 
 	menu_option=path+"/AlbumMenu/AL_all"  #Hides/shows the 'All' option in the "Album" submenu	
 	if other_settings[1]: shell.props.ui_manager.get_widget(menu_option).show()
@@ -254,6 +256,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     if other_settings[0]: shell.props.ui_manager.get_widget("/MenuBar/WebMenu/Optionsitem").show()
     else: shell.props.ui_manager.get_widget("/MenuBar/WebMenu/Optionsitem").hide()
+
+    shell.props.ui_manager.ensure_update()
 
 ##########
 #The "do_activate" function is called when Rhythmbox is loaded
@@ -358,7 +362,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
   def open_options(self, event, shell):
 	config_dialog = WMConfigDialog()
-	WMConfigDialog.manage_window(config_dialog, None)
+	WMConfigDialog.manage_window_called_from_options(config_dialog, None)
 
 ##########
 #The "song_changed" function controls if no song is playing. If it is so, the 'Web' menu options are disabled.

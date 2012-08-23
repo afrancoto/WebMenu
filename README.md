@@ -4,9 +4,9 @@ RHYTHMBOX Web Menu 2.0 (Work in progress)
 TO DO
 =====
 - Manage window
-  - Remove error on call from Rhythmbox Plugins window
-  - Bug: Manage window does not close after Add service + Apply
-  - Remove Waring on apply_settings
+  - Remove Waring on draw_menu
+  - Remove error on call from Rhythmbox Plugins window [DONE]
+  - Bug: Manage window does not close after Add service + Apply [DONE]
   - Reorder the menus in the settings[DONE] -> Redraw the menus [DONE]
   - Must completely substitute the config window [DONE]
   - Let it open a new widget with an orderable list [DONE]
