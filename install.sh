@@ -65,7 +65,7 @@ SCRIPT_NAME=`basename "$0"`
 SCRIPT_PATH=${0%`basename "$0"`}
 
 #deletes old files
-echo Deleting old files
+echo "Deleting old files (password needed)"
 #sudo rm "${GLIB_DIR}${GLIB_SCHEME}" &>/dev/null
 sudo rm -r "/home/${USER}/.local/share/rhythmbox/plugins/WebMenu" &>/dev/null
 sudo rm -r "/usr/lib/rhythmbox/plugins/WebMenu" &>/dev/null
@@ -83,6 +83,7 @@ echo Installing the plugin
 if [[ $LOCAL == true ]]
 then
     PLUGIN_PATH="/home/${USER}/.local/share/rhythmbox/plugins/WebMenu/"
+    echo in $PLUGIN_PATH
     
     #build the dirs
     mkdir -p $PLUGIN_PATH
@@ -94,6 +95,7 @@ then
     #rm "${PLUGIN_PATH}${SCRIPT_NAME}"
 else
     PLUGIN_PATH="/usr/lib/rhythmbox/plugins/WebMenu/"
+    echo in $PLUGIN_PATH
     
     #build the dirs
     sudo mkdir -p $PLUGIN_PATH

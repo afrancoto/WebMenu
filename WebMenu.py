@@ -84,7 +84,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
   def draw_menu(self, shell):
     global action_group, action_group_submenus
-    global ui_id
+    global ui_id, ui_manager
 
     menu_not_drawn=False #Usually the function is called by apply_settings, so the menu is already drawn
 
@@ -107,7 +107,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     youtube_action.connect ('activate', self.search_on_youtube, shell)
     action_group.add_action_with_accel (youtube_action, "<alt>Y")
 
-    #0.2 Album SubMenu
+    #0.2 Album SubMenu-----------------------------------------------------------------------------------------------------------------------------
     album_menu_action = Gtk.Action("album_menu_action", _("Album"), None, None)
     action_group.add_action(album_menu_action)
     #0.2.X Album SubMenu Items
@@ -121,14 +121,13 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
         	action = Gtk.Action( action_name, service, _('Look for the current album on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 1, service)
 		
-		shortcut_exist=True #Checks if a shortcut exist		
+		shortcut_exist=True #Checks if a shortcut exist	for a service	
 		try: shortcuts[service]
 		except: shortcut_exist=False
-        	if (shortcut_exist) and (shortcuts[service][0] is not ''): 
-			action_group_submenus.remove_action(action)
-			action_group_submenus.add_action_with_accel(action, shortcuts[service][0]) #If the shortcut exist, it's added 
-			print service+" Album shortcut exist:"+shortcuts[service][0]
-			ui_manager.ensure_update()
+
+        	if (shortcut_exist) and (shortcuts[service][0] is not ''): #If the shortcut exist and we are in thr right submenu, it's added
+			action_group_submenus.add_action_with_accel(action, shortcuts[service][0]) 
+			print "Album shortcut: "+service+" -->"+shortcuts[service][0]
 		else: action_group_submenus.add_action(action)
 
     #0.2.n Album -> Every Service
@@ -136,7 +135,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     album_all_action.connect ('activate', self.search_on_all, shell, 1) #The last argument "1" stands for "Album"
     action_group.add_action(album_all_action)
 
-    #0.3 Artist SubMenu
+    #0.3 Artist SubMenu-----------------------------------------------------------------------------------------------------------------------------
     artist_menu_action = Gtk.Action("artist_menu_action", _("Artist"), None, None)
     action_group.add_action(artist_menu_action)
     #0.3.X Artist SubMenu Items 
@@ -149,32 +148,32 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
         	#Create the action
         	action = Gtk.Action( action_name, service, _('Look for the current artist on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 2, service)
-
-		shortcut_exist=True #Checks if a shortcut exist
+		
+		shortcut_exist=True #Checks if a shortcut exist	for a service	
 		try: shortcuts[service]
 		except: shortcut_exist=False
-        	if (shortcut_exist) and (shortcuts[service][1] is not ''): 
-			action_group_submenus.remove_action(action)
-			action_group_submenus.add_action_with_accel(action, shortcuts[service][1]) #If the shortcut exist, it's added 
-			print service+" Artist shortcut exist:"+shortcuts[service][1]
-			ui_manager.ensure_update()
+
+        	if (shortcut_exist) and (shortcuts[service][1] is not ''): #If the shortcut exist and we are in thr right submenu, it's added
+			action_group_submenus.add_action_with_accel(action, shortcuts[service][1])  
 		else: action_group_submenus.add_action(action)
+
     #0.3.n Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all', _('All'), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, 2) #The last argument "2" stands for "Artist"
     action_group.add_action(artist_all_action)
 
-    #0.4 Options
+    #0.4 Options------------------------------------------------------------------------------------------------------------------------------------
     options_action = Gtk.Action ('options_action', _('Options'), _('WebMenu Options'), "")
     options_action.connect ('activate', self.open_options, shell)
     action_group.add_action (options_action)
 
-    ui = web_menu_item % (ui_album, ui_artist) #Adds ui_album and ui_artist to the webmenu
-    ui_manager.insert_action_group(action_group)
+    ui_manager.insert_action_group(action_group) #Adds the action groups
     ui_manager.insert_action_group(action_group_submenus)
-    ui_id = ui_manager.add_ui_from_string(ui)
     ui_manager.ensure_update()
 
+    ui = web_menu_item % (ui_album, ui_artist) #Adds ui_album and ui_artist to the webmenu
+    ui_id = ui_manager.add_ui_from_string(ui)
+    ui_manager.ensure_update()
 ##########
 #The "draw_context_menu" function creates the entries in the context menu and associates them to their specific function.
 ##########

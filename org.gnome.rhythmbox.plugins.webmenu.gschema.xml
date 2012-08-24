@@ -26,9 +26,9 @@
 	</key>
 
 	<key type="a{s(ss)}" name="shortcuts">
-			<default>{'Wikipedia':('&lt;Alt&gt;W', ''),
-				  'AllMusic':( '', '&lt;Alt&gt;M'),
-				  'Torrentz':('', '&lt;Alt&gt;T')}</default>
+			<default>{'Wikipedia':('&lt;Alt&gt;W', '&lt;Control&gt;W'),
+				  'AllMusic':( '&lt;Alt&gt;M', ''),
+				  'Torrentz':('', '&lt;Control&gt;T')}</default>
 			<summary>Shortcuts</summary>
 			<description>Shortcuts - Service:{Album blindig, Artist blindig}</description>
 	</key>

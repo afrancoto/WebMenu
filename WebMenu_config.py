@@ -522,8 +522,8 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 #The "apply_settings" function is called by the "apply" button in the manager window, it's the only function that writes in dconf ("reset_to_default" excluded)  
 ########## 
     def apply_settings(self, widget, data=None):
+	self.settings['shortcuts']=shortcuts
 	self.settings['services']=services
 	self.settings['services-order']=services_order
 	self.settings['other-settings']=other_settings
-	self.settings['shortcuts']=shortcuts
 
