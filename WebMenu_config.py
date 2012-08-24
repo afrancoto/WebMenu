@@ -106,10 +106,18 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	(model, tree_iter) =  treeview.get_selection().get_selected()
         service = model.get_value(tree_iter,0) #The selected service is the one wich is moved
 
+	last=len(services_order)-1
 	moved_one_index=services_order.index(service)
-	if direction is 'down': moved_two_index=moved_one_index + 1
-	if direction is 'up': moved_two_index=moved_one_index - 1
+	print "1:"+str(moved_one_index)
+	if direction is 'down':
+		if moved_one_index == last: moved_two_index=0
+		else: moved_two_index=moved_one_index + 1 #If it's last, it becomes first
+	if direction is 'up': 
+		if moved_one_index == 0: moved_two_index=last
+		else: moved_two_index=moved_one_index - 1 #It it's first, it becomes last
 	
+	print "2:"+str(moved_two_index)
+
 	services_order[moved_one_index]=services_order[moved_two_index] #It swaps the variables
 	services_order[moved_two_index]=service
 
