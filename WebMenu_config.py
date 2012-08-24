@@ -79,8 +79,10 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	
 	service_line = list(services[service]) #A tuple is read-only, so we need to convert it into a list to modify it
 
-	service_line[what+2] = not model[path][what+2] #The setting relative to the checkbox is updated
-	if services[service][what] is not '': model[path][what+2] = service_line[what+2] #The checkbox is updated
+
+	if services[service][what] is not '': 
+		service_line[what+2] = not model[path][what+2] #The setting relative to the checkbox is updated
+		model[path][what+2] = service_line[what+2] #The checkbox is updated
 
 	services[service]= tuple(service_line) #Back to tuple
 
