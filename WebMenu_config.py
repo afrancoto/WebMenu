@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import webbrowser, os
+import webbrowser
 import urllib2
 
 from gi.repository import Gio
@@ -202,7 +202,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	global MANAGE_WINDOW_RUNNING
 
 	self.window = Gtk.Window()
-	#os.system("echo created")
 	MANAGE_WINDOW_RUNNING=True
 
 	liststore = Gtk.ListStore(str, str, str, bool, bool)
@@ -342,7 +341,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
     def on_manage_destroy(self, event):
 	global MANAGE_WINDOW_RUNNING
 	self.window.destroy()
-	#os.system("echo destroyed")
 	MANAGE_WINDOW_RUNNING=False
 
     def manage_window_called_from_options(self, widget, data=None):

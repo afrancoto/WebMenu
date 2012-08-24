@@ -15,7 +15,7 @@
 
 
 from gi.repository import GObject, RB, Peas, Gtk
-import webbrowser, os
+import webbrowser
 import urllib2
 
 from WebMenu_config import WMConfig
