@@ -139,8 +139,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	
 	print "2:"+str(moved_two_index)
 
-
-
 	liststore.clear() #And updates the list
 	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
 	treeview.set_cursor(moved_two_index)
@@ -194,8 +192,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 ##########
 #The "reset_to_default" function is called by the "reset_to_default" button. 
 ##########  
-    def reset_to_default(self, widget, liststore):
-	#TODO: Update the other-settings checkboxes when settings are resetted 
+    def reset_to_default(self, widget, liststore, all_album_check, all_artist_check, options_check):
 	global services, services_order, other_settings
 
 	question = _("Are you sure you want to restore the default services and options?\n All your changes will be lost.")  #A confirmation is required
@@ -211,9 +208,13 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 		services_order=self.settings['services-order']
 		other_settings=self.settings['other-settings']
 	
-		liststore.clear() #And the list is updated
+		liststore.clear() #The list is updated
         	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
-
+		
+		all_album_check.set_active(other_settings[1]) #The other-settings checkboxes are updated
+       		all_artist_check.set_active(other_settings[2])
+		options_check.set_active(other_settings[0])
+		
 ##########
 #The "row_changed" function adds a tooltip for each row with the URLs. 
 ##########  
@@ -232,9 +233,14 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 #The "manager_window" function draws the main settings window. 
 ##########  
     def manager_window(self, widget, data=None):
-	global MANAGER_WINDOW_RUNNING
-
+	global MANAGER_WINDOW_RUNNING, last_window_created
+	
+	if MANAGER_WINDOW_RUNNING: last_window_created.destroy() #This can be true only if a manager window is opened by the Preferences window when another one is already opened by manager_window_called_from_options():
+								 #the second one is destroyed (the settings are applied) and the the Peas window is opened.
+	
 	self.window = Gtk.Window()
+	last_window_created=self.window
+
 	MANAGER_WINDOW_RUNNING=True
 
 	liststore = Gtk.ListStore(str, str, str, bool, bool)
@@ -344,7 +350,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         hbox1.pack_start(delete_button, False, True, 0)
 
         reset_button = Gtk.Button('Reset to default')
-        reset_button.connect("clicked", self.reset_to_default, liststore)
+        reset_button.connect("clicked", self.reset_to_default, liststore, all_album_check, all_artist_check, options_check)
         hbox1.pack_end(reset_button, False, False, 0)
 	vbox.pack_start(hbox1, False, True, 0)
 
@@ -366,15 +372,15 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
     def on_manager_destroy(self, event):
 	global MANAGER_WINDOW_RUNNING
-	self.apply_settings(None)
-	self.window.destroy()
+	self.apply_settings(None) #Applies every setting
+	self.window.destroy() #Deletes the window wich is opened when vbox is created in manager_window()
 	MANAGER_WINDOW_RUNNING=False
 
     def manager_window_called_from_options(self, widget, data=None):
-    	if not MANAGER_WINDOW_RUNNING:
+    	if not MANAGER_WINDOW_RUNNING: #If manager_window() is already opened, it does nothing
 		vbox=self.manager_window(self, None)
 
-		hbox=Gtk.HBox()
+		hbox=Gtk.HBox() #Adds the "close" button
 		cancel_button = Gtk.Button(stock=Gtk.STOCK_CLOSE)
 		cancel_button.connect_object("clicked", Gtk.Widget.destroy, vbox)
 		hbox.pack_end(cancel_button, False, False, 5)
