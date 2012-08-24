@@ -23,7 +23,7 @@ from gi.repository import Gtk
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.webmenu'
 CURRENT_VERSION = '2.0'
-MANAGE_WINDOW_RUNNING=False
+MANAGER_WINDOW_RUNNING=False
 services = {}
 services_order = []
 other_settings=[]
@@ -67,10 +67,10 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         self.settings = Gio.Settings(DCONF_DIR)
 
     def do_create_configure_widget(self):
-         return self.manage_window(Gtk.Widget)
+         return self.manager_window(Gtk.Widget)
 
 ##########
-#The "website_toggled_from_list" function is called whenever a checkbox of a website in the manage window is toggled. 
+#The "website_toggled_from_list" function is called whenever a checkbox of a website in the manager window is toggled. 
 ##########     
     def website_toggled_from_list(self, checkbutton, path, treeview, what):
 	global services
@@ -107,24 +107,49 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         service = model.get_value(tree_iter,0) #The selected service is the one wich is moved
 
 	last=len(services_order)-1
+	print "last:"+str(last)
 	moved_one_index=services_order.index(service)
 	print "1:"+str(moved_one_index)
+
 	if direction is 'down':
-		if moved_one_index == last: moved_two_index=0
-		else: moved_two_index=moved_one_index + 1 #If it's last, it becomes first
+		if moved_one_index == last:
+			index=last
+			service_last=services_order[last]
+			while index > 0:
+				services_order[index]=services_order[index-1]
+				index-=1
+			services_order[0]=service_last
+			moved_two_index=0
+		else: 
+			moved_two_index=moved_one_index + 1
+		  	self.swap_services(moved_one_index, moved_two_index)
+
 	if direction is 'up': 
-		if moved_one_index == 0: moved_two_index=last
-		else: moved_two_index=moved_one_index - 1 #It it's first, it becomes last
+		if moved_one_index == 0: 
+			index=0
+			service_first=services_order[0]
+			while index < last:
+				services_order[index]=services_order[index+1]
+				index+=1
+			services_order[last]=service_first
+			moved_two_index=last
+		else: 
+			moved_two_index=moved_one_index - 1
+		  	self.swap_services(moved_one_index, moved_two_index)
 	
 	print "2:"+str(moved_two_index)
 
-	services_order[moved_one_index]=services_order[moved_two_index] #It swaps the variables
-	services_order[moved_two_index]=service
+
 
 	liststore.clear() #And updates the list
 	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
 	treeview.set_cursor(moved_two_index)
 
+    def swap_services(self, index_one, index_two):
+	swap_variable=services_order[index_one]
+	services_order[index_one]=services_order[index_two]
+	services_order[index_two]=swap_variable
+	
 ##########
 #The "new_service_add" function is called from the "new_service_window". 
 ##########  
@@ -204,13 +229,13 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 		label_artist_URL.set_text('')	
 
 ##########
-#The "manage_window" function draws the main settings window. 
+#The "manager_window" function draws the main settings window. 
 ##########  
-    def manage_window(self, widget, data=None):
-	global MANAGE_WINDOW_RUNNING
+    def manager_window(self, widget, data=None):
+	global MANAGER_WINDOW_RUNNING
 
 	self.window = Gtk.Window()
-	MANAGE_WINDOW_RUNNING=True
+	MANAGER_WINDOW_RUNNING=True
 
 	liststore = Gtk.ListStore(str, str, str, bool, bool)
 	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
@@ -280,7 +305,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	frame.add(scroll_urls)
 	hbox_out_frame=Gtk.HBox()
 	hbox_out_frame.pack_start(frame, True, True, 5)    
-	vbox.pack_start(hbox_out_frame, False, True, 5)    
+	vbox.pack_start(hbox_out_frame, False, True, 0)    
 
 	other_settings_hbox=Gtk.HBox()
 
@@ -321,46 +346,40 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         reset_button = Gtk.Button('Reset to default')
         reset_button.connect("clicked", self.reset_to_default, liststore)
         hbox1.pack_end(reset_button, False, False, 0)
-	vbox.pack_start(hbox1, False, True, 5)
+	vbox.pack_start(hbox1, False, True, 0)
 
 	hbox2=Gtk.HBox()
 
 	update_button = Gtk.Button("Updates? (v."+CURRENT_VERSION+")")
 	update_button.connect("clicked", self.update_search)
-        hbox2.pack_start(update_button, False, False, 0)
+        hbox2.pack_start(update_button, True, True, 0)
 
-	done_button = Gtk.Button(stock=Gtk.STOCK_APPLY)
-	hbox2.pack_end(done_button, False, True, 0)
-	done_button.connect_object("clicked", self.apply_settings, self)
+	#done_button = Gtk.Button(stock=Gtk.STOCK_APPLY)
+	#hbox2.pack_end(done_button, False, True, 0)
+	#done_button.connect_object("clicked", self.apply_settings, self)
 
-	#cancel_button = Gtk.Button(stock=Gtk.STOCK_CANCEL)
-	#hbox2.pack_end(cancel_button, False, False, 0)
-	#cancel_button.connect_object("clicked", Gtk.Widget.destroy, self.window)
-
-	vbox.pack_start(hbox2, False, True, 5)
-
-	remember_label=Gtk.Label("<b>Remember to apply your changes!</b>", use_markup=True)
-	vbox.pack_start(remember_label, False, False, 10)
+	vbox.pack_start(hbox2, False, True, 0)
 
 	treeview.connect('cursor-changed', self.row_changed, label_album_URL, label_artist_URL)
-	vbox.connect("destroy", self.on_manage_destroy)
+	vbox.connect("destroy", self.on_manager_destroy)
 	return vbox
 
-    def on_manage_destroy(self, event):
-	global MANAGE_WINDOW_RUNNING
+    def on_manager_destroy(self, event):
+	global MANAGER_WINDOW_RUNNING
+	self.apply_settings(None)
 	self.window.destroy()
-	MANAGE_WINDOW_RUNNING=False
+	MANAGER_WINDOW_RUNNING=False
 
-    def manage_window_called_from_options(self, widget, data=None):
-    	if not MANAGE_WINDOW_RUNNING:
-		vbox=self.manage_window(self, None)
+    def manager_window_called_from_options(self, widget, data=None):
+    	if not MANAGER_WINDOW_RUNNING:
+		vbox=self.manager_window(self, None)
 
 		hbox=Gtk.HBox()
 		cancel_button = Gtk.Button(stock=Gtk.STOCK_CLOSE)
 		cancel_button.connect_object("clicked", Gtk.Widget.destroy, vbox)
-		hbox.pack_end(cancel_button, False, True, 5)
+		hbox.pack_end(cancel_button, False, False, 5)
 
-		vbox.pack_start(hbox, True, True, 5)
+		vbox.pack_start(hbox, False, False, 5)
 		self.window.add(vbox)
 		self.window.show_all()
 ##########
@@ -436,7 +455,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 
 ##########
-#The "apply_settings" function is called by the "apply" button in the manage window, it's the only function that writes in dconf ("reset_to_default" excluded)  
+#The "apply_settings" function is called by the "apply" button in the manager window, it's the only function that writes in dconf ("reset_to_default" excluded)  
 ########## 
     def apply_settings(self, widget, data=None):
 	self.settings['services']=services

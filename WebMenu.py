@@ -359,7 +359,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
   def open_options(self, event, shell):
 	config_dialog = WMConfigDialog()
-	WMConfigDialog.manage_window_called_from_options(config_dialog, None)
+	WMConfigDialog.manager_window_called_from_options(config_dialog, None)
 
 ##########
 #The "song_changed" function controls if no song is playing. If it is so, the 'Web' menu options are disabled.
