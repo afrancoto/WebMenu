@@ -33,11 +33,12 @@ class WMConfig(object):
 #The "__init__" function is called by the "do_activate" function in WebMenu.py when the program is launced. It saves the global variables for WebMenu_config.py
 ##########
     def __init__(self):
-	global services, services_order, other_settings
+	global services, services_order, other_settings, shortcuts
         self.settings = Gio.Settings(DCONF_DIR)
 	services = self.settings['services'] #'services' is a global variable with all the settings in it
 	services_order=self.settings['services-order']
 	other_settings=self.settings['other-settings']
+    	shortcuts = self.settings['shortcuts'] #'shortcuts' is a global variables with album and artist shortcuts
 
     def get_settings(self):
         return self.settings
@@ -46,8 +47,8 @@ class WMConfig(object):
 #The "check_services_order" function is called by the "apply_settings" function in WebMenu.py. It eliminates settings errors. 
 ##########
     def check_services_order(self):
-	global services_order
-	changed=False #The services order is rewritten only if it is changed by this function
+	global services_order, shortcuts
+	changed=False #The services order and shortcuts are rewritten only if one of them is changed by this function
 	for service, data in services.items():
 		if service not in services_order: 
 			services_order.append(service) #If a service is missing from the "service-order" key, it is added at the end
@@ -56,7 +57,13 @@ class WMConfig(object):
 		if service not in services: 
 			services_order.remove(service) #If a service is missing from the "services" key, it is also deleted from the "service-order" key
 			changed=True
-	if changed: self.settings['services-order']=services_order
+	for service in shortcuts:
+		if service not in services: 
+			shortcuts.remove(service) #If a service is missing from the "services" key, it is also deleted from the "shortcuts" key
+			changed=True	
+	if changed: 
+		self.settings['services-order']=services_order
+		self.settings['shortcuts']=shortcuts
          
 class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
     __gtype_name__ = 'WebMenuConfigDialog'
@@ -139,8 +146,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	
 	print "2:"+str(moved_two_index)
 
-	liststore.clear() #And updates the list
-	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
+	self.update_liststore(liststore)  #And updates the list
 	treeview.set_cursor(moved_two_index)
 
     def swap_services(self, index_one, index_two):
@@ -164,8 +170,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         	services[service] = ('', album_URL, artist_URL , True, True) #Writes the new service in the global variables
 		services_order.append(service)
 
-	liststore.clear() #And updates the list
-	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
+	self.update_liststore(liststore)  #And updates the list
 	treeview.set_cursor(len(services_order)-1)
         self.new_service_window.destroy()
 
@@ -186,14 +191,13 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	    del services[service]
 	    services_order.remove(service)  #Deletes the service from the global variables
 	    
-	    liststore.clear() #And updates the list
-	    for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
+	self.update_liststore(liststore)  #And updates the list
 
 ##########
 #The "reset_to_default" function is called by the "reset_to_default" button. 
 ##########  
     def reset_to_default(self, widget, liststore, all_album_check, all_artist_check, options_check):
-	global services, services_order, other_settings
+	global services, services_order, other_settings, shortcuts
 
 	question = _("Are you sure you want to restore the default services and options?\n All your changes will be lost.")  #A confirmation is required
     	dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, question) 
@@ -204,19 +208,20 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 		self.settings.reset('services') #Settings are resetted, that's the only function that doesn't need "apply_settings"
 		self.settings.reset('services-order')
 		self.settings.reset('other-settings')
+		self.settings.reset('shortcuts')
 		services = self.settings['services'] #Global variables are updated
 		services_order=self.settings['services-order']
 		other_settings=self.settings['other-settings']
+		shortcuts=self.settings['shortcuts']
 	
-		liststore.clear() #The list is updated
-        	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
+		self.update_liststore(liststore)  #And updates the list
 		
 		all_album_check.set_active(other_settings[1]) #The other-settings checkboxes are updated
        		all_artist_check.set_active(other_settings[2])
 		options_check.set_active(other_settings[0])
 		
 ##########
-#The "row_changed" function adds a tooltip for each row with the URLs. 
+#The "row_changed" function writes the Album and Artist URL in the frame of the manager window. 
 ##########  
     def row_changed(self, treeview, label_album_URL, label_artist_URL):
 	try:
@@ -228,6 +233,37 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	except:
 		label_album_URL.set_text('')
 		label_artist_URL.set_text('')	
+
+##########
+#The "shortcut_edited" function is called whenever a shortcut is changed. 
+########## 
+    def shortcut_edited(self, cell, path, new_text, treeview, liststore, what):
+	global shortcuts
+	(model, tree_iter) =  treeview.get_selection().get_selected()
+        service = model.get_value(tree_iter,0) #Gets the selected one
+
+	try: service_line=list(shortcuts[service]) #If the line in the dict doesn't exist, it's created (empty)
+	except: service_line=['','']
+
+	service_line[what-1]=new_text #The shortcut is added
+	shortcuts[service]=tuple(service_line)
+
+	self.update_liststore(liststore) #The list is updated
+
+##########
+#The "update_liststore" function simply updated the liststore, checking if the shortcuts exist. 
+########## 
+    def update_liststore(self, liststore):
+	liststore.clear()
+	for service in services_order:
+		try:
+		 	album_shortcut=shortcuts[service][0]
+			artist_shortcut=shortcuts[service][1]
+		except:
+			album_shortcut=''
+			artist_shortcut=''
+
+		liststore.append([service, album_shortcut, artist_shortcut, services[service][3], services[service][4]])
 
 ##########
 #The "manager_window" function draws the main settings window. 
@@ -244,7 +280,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	MANAGER_WINDOW_RUNNING=True
 
 	liststore = Gtk.ListStore(str, str, str, bool, bool)
-	for service in services_order: liststore.append([service, services[service][1], services[service][2], services[service][3], services[service][4]])
+	self.update_liststore(liststore)
 	
 	vbox=Gtk.VBox()
 	treeview = Gtk.TreeView(liststore)
@@ -254,7 +290,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         column_0 = Gtk.TreeViewColumn("Service", rendererText, text=0)
 	column_0.set_resizable(True)
 	column_0.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        column_0.set_fixed_width(200)
+        column_0.set_fixed_width(100)
         treeview.append_column(column_0)
 
 	rendererAlbumCheck = Gtk.CellRendererToggle()
@@ -262,7 +298,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	rendererAlbumCheck.connect("toggled", self.website_toggled_from_list, treeview, 1)
 	column_1 = Gtk.TreeViewColumn("Album", rendererAlbumCheck, active=3)
 	column_1.set_resizable(True)
-      	column_1.set_fixed_width(150)
+      	column_1.set_fixed_width(75)
         treeview.append_column(column_1)
 
 	rendererArtistCheck = Gtk.CellRendererToggle()
@@ -270,13 +306,31 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	rendererArtistCheck.connect("toggled", self.website_toggled_from_list, treeview, 2)
 	column_2 = Gtk.TreeViewColumn("Artist", rendererArtistCheck, active=4)
 	column_2.set_resizable(True)
-        column_2.set_fixed_width(150)
-        treeview.append_column(column_2)	
+        column_2.set_fixed_width(75)
+        treeview.append_column(column_2)
+
+	rendererAlbumEditable = Gtk.CellRendererText()
+	rendererAlbumEditable.set_property('editable', True)
+	rendererAlbumEditable.connect("edited", self.shortcut_edited, treeview, liststore, 1)
+        column_3 = Gtk.TreeViewColumn("Album Shortcut", rendererAlbumEditable, text=1)
+	column_3.set_resizable(True)
+	column_3.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        column_3.set_fixed_width(95)
+        treeview.append_column(column_3)
+	
+	rendererArtistEditable = Gtk.CellRendererText()
+	rendererArtistEditable.set_property('editable', True)
+	rendererArtistEditable.connect("edited", self.shortcut_edited, treeview, liststore, 2)
+        column_4 = Gtk.TreeViewColumn("Artist Shortcut", rendererArtistEditable, text=2)
+	column_4.set_resizable(True)
+	column_4.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        column_4.set_fixed_width(90)
+        treeview.append_column(column_4)
 
 	scroll = Gtk.ScrolledWindow()
     	scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
     	scroll.add(treeview)
-	scroll.set_min_content_width(300)
+	scroll.set_min_content_width(370)
 	scroll.set_min_content_height(300)
 	vbox.pack_start(scroll, True, True, 5)
 
@@ -349,9 +403,13 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         delete_button.connect("clicked", self.delete_service, treeview, liststore)
         hbox1.pack_start(delete_button, False, True, 0)
 
+	#shortcut_button = Gtk.Button('Edit Shortcuts')
+        #shortcut_button.connect("clicked", self.edit_shortcuts_window)
+        #hbox1.pack_start(shortcut_button, False, True, 0)
+
         reset_button = Gtk.Button('Reset to default')
         reset_button.connect("clicked", self.reset_to_default, liststore, all_album_check, all_artist_check, options_check)
-        hbox1.pack_end(reset_button, False, False, 0)
+        hbox1.pack_end(reset_button, False, True, 0)
 	vbox.pack_start(hbox1, False, True, 0)
 
 	hbox2=Gtk.HBox()
@@ -467,4 +525,5 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	self.settings['services']=services
 	self.settings['services-order']=services_order
 	self.settings['other-settings']=other_settings
+	self.settings['shortcuts']=shortcuts
 

@@ -16,13 +16,21 @@
 		   'Torrentz' :('', 'http://torrentz.com/search?f=[ALBUM]+[ARTIST]', 'http://torrentz.com/search?f=[ARTIST]', false, true)
 	}</default>
     	<summary>Music Services</summary>
-    	<description>Services with their respectives urls for song, album and artist search</description>
+    	<description>Music Services - Service:(Song URL, Album URL, Artist URL, Show in Album?, Show in Artist?)</description>
 	</key>
 
 	<key type="as" name="services-order">
 			<default>['Wikipedia', 'AllMusic', 'RateYourMusic', 'AllAboutJazz', 'DiscoGS', 'Official Website', 'Last.fm', 'Grooveshark', 'Facebook', 'MySpace', 'Amazon.com', 'Torrentz']</default>
 			<summary>The menus are displayed in this order</summary>
 			<description>The menus are displayed in this order</description>
+	</key>
+
+	<key type="a{s(ss)}" name="shortcuts">
+			<default>{'Wikipedia':('&lt;Alt&gt;W', ''),
+				  'AllMusic':( '', '&lt;Alt&gt;M'),
+				  'Torrentz':('', '&lt;Alt&gt;T')}</default>
+			<summary>Shortcuts</summary>
+			<description>Shortcuts - Service:{Album blindig, Artist blindig}</description>
 	</key>
 
 	<key type="ab" name="other-settings">

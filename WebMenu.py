@@ -26,6 +26,9 @@ from WebMenu_config import WMConfigDialog
 
 services = {}
 services_order = []
+other_settings = []
+shortcuts = {}
+
 web_menu_item = '''
   <ui>
     <menubar name="MenuBar">
@@ -80,7 +83,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
 
   def draw_menu(self, shell):
-    global action_group
+    global action_group, action_group_submenus
     global ui_id
 
     menu_not_drawn=False #Usually the function is called by apply_settings, so the menu is already drawn
@@ -90,11 +93,13 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     if not menu_not_drawn :
 	ui_manager.remove_ui(ui_id) #Delete a previous drawn menu
-	del ui_id
+	ui_manager.remove_action_group(action_group_submenus)
+	del ui_id, action_group_submenus
 	ui_manager.ensure_update()	
 
     #0. Web Menu
     action_group = Gtk.ActionGroup(name='WebMenuActionGroup')
+    action_group_submenus= Gtk.ActionGroup(name='WebMenuSubmenusActionGroup')
     web_menu_action = Gtk.Action("WebMenuAction", _("Web"), None, None)
     action_group.add_action(web_menu_action)
     #0.1 Song on Youtube
@@ -115,7 +120,17 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
         	#Create the action
         	action = Gtk.Action( action_name, service, _('Look for the current album on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 1, service)
-        	action_group.add_action( action )
+		
+		shortcut_exist=True #Checks if a shortcut exist		
+		try: shortcuts[service]
+		except: shortcut_exist=False
+        	if (shortcut_exist) and (shortcuts[service][0] is not ''): 
+			action_group_submenus.remove_action(action)
+			action_group_submenus.add_action_with_accel(action, shortcuts[service][0]) #If the shortcut exist, it's added 
+			print service+" Album shortcut exist:"+shortcuts[service][0]
+			ui_manager.ensure_update()
+		else: action_group_submenus.add_action(action)
+
     #0.2.n Album -> Every Service
     album_all_action = Gtk.Action ('album_all', _('All'), _('Look for the current album on every service'), "")
     album_all_action.connect ('activate', self.search_on_all, shell, 1) #The last argument "1" stands for "Album"
@@ -134,7 +149,16 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
         	#Create the action
         	action = Gtk.Action( action_name, service, _('Look for the current artist on %s' % service), '' )
         	action.connect( 'activate', self.unique_search_function, shell, 2, service)
-	        action_group.add_action( action )
+
+		shortcut_exist=True #Checks if a shortcut exist
+		try: shortcuts[service]
+		except: shortcut_exist=False
+        	if (shortcut_exist) and (shortcuts[service][1] is not ''): 
+			action_group_submenus.remove_action(action)
+			action_group_submenus.add_action_with_accel(action, shortcuts[service][1]) #If the shortcut exist, it's added 
+			print service+" Artist shortcut exist:"+shortcuts[service][1]
+			ui_manager.ensure_update()
+		else: action_group_submenus.add_action(action)
     #0.3.n Artist -> Every Service
     artist_all_action = Gtk.Action ('artist_all', _('All'), _('Look for the current artist on every service'), "")
     artist_all_action.connect ('activate', self.search_on_all, shell, 2) #The last argument "2" stands for "Artist"
@@ -147,6 +171,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     ui = web_menu_item % (ui_album, ui_artist) #Adds ui_album and ui_artist to the webmenu
     ui_manager.insert_action_group(action_group)
+    ui_manager.insert_action_group(action_group_submenus)
     ui_id = ui_manager.add_ui_from_string(ui)
     ui_manager.ensure_update()
 
@@ -214,13 +239,14 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 #The "apply_settings" function is called when Rhythmbox is loaded and whenever the settings are changed
 ##########
   def apply_settings(self, settings, key, shell, config):
-    global services, services_order, other_settings
+    global services, services_order, other_settings, shortcuts
 
     #The global variables are updated if changed
     if (key is not 'all') and (key is not 'firsttime'): 
 	services = self.settings['services']
 	services_order = self.settings['services-order']
     	other_settings = self.settings['other-settings']
+    	shortcuts = self.settings['shortcuts']
 
     config.check_services_order() #Checks settings integrity
     
@@ -264,7 +290,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     #     STRING            0:STRING          1:STRING          2:STRING               3:BOOLEAN                  4:BOOLEAN
     # 'service_name' : ('song_engine_url','album_engine_url','artist_engine_url', enabled_in_album_submenu, enabled_in_artist_submenu)
 
-    global services, services_order, other_settings
+    global services, services_order, other_settings, shortcuts
     global ui_manager
 
     shell = self.object
@@ -274,6 +300,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     services = self.settings['services'] #'services' is a global variable with all the settings in it
     services_order = self.settings['services-order'] #'services-order' is a global variable that keeps the right order for the menu items
     other_settings = self.settings['other-settings'] #'other-settings' is an array of booleans: ['Options' item, 'All' item in album menu, 'All' item in artist menu]
+    shortcuts = self.settings['shortcuts'] #'shortcuts' is a global variables with album and artist shortcuts
 
     self.draw_menu(shell) #Calls "draw_menu"
     self.draw_context_menu(shell) #Calls "draw_context_menu"
@@ -290,12 +317,13 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
   def do_deactivate(self):
     global ui_id, ui_context_id
-    global action_group, context_action_group
+    global action_group, action_group_submenus, context_action_group
 
     shell = self.object
     ui_manager.remove_ui(ui_id)
     ui_manager.remove_action_group(action_group)
-    del ui_id, action_group
+    ui_manager.remove_action_group(action_group_submenus)
+    del ui_id, action_group, action_group_submenus
     ui_manager.remove_ui(ui_context_id)
     ui_manager.remove_action_group(context_action_group)
     del ui_context_id, context_action_group
