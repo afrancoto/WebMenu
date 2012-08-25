@@ -79,13 +79,11 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 ##########
 #The "website_toggled_from_list" function is called whenever a checkbox of a website in the manager window is toggled. 
 ##########     
-    def website_toggled_from_list(self, checkbutton, path, treeview, what):
+    def website_toggled_from_list(self, checkbutton, path, model, what):
 	global services
-	(model, tree_iter) =  treeview.get_selection().get_selected()
-        service = model[path][0] #Gets the service name which is in the first column of the row with the toggled checkbox
+	service = model[path][0] #Gets the service name which is in the first column of the row with the toggled checkbox
 	
 	service_line = list(services[service]) #A tuple is read-only, so we need to convert it into a list to modify it
-
 
 	if services[service][what] is not '': 
 		service_line[what+2] = not model[path][what+2] #The setting relative to the checkbox is updated
@@ -295,7 +293,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 	rendererAlbumCheck = Gtk.CellRendererToggle()
 	rendererAlbumCheck.set_property('activatable', True)
-	rendererAlbumCheck.connect("toggled", self.website_toggled_from_list, treeview, 1)
+	rendererAlbumCheck.connect("toggled", self.website_toggled_from_list, liststore, 1)
 	column_1 = Gtk.TreeViewColumn("Album", rendererAlbumCheck, active=3)
 	column_1.set_resizable(True)
       	column_1.set_fixed_width(75)
@@ -303,7 +301,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 	rendererArtistCheck = Gtk.CellRendererToggle()
 	rendererArtistCheck.set_property('activatable', True)
-	rendererArtistCheck.connect("toggled", self.website_toggled_from_list, treeview, 2)
+	rendererArtistCheck.connect("toggled", self.website_toggled_from_list, liststore, 2)
 	column_2 = Gtk.TreeViewColumn("Artist", rendererArtistCheck, active=4)
 	column_2.set_resizable(True)
         column_2.set_fixed_width(75)
