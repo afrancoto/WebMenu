@@ -157,15 +157,15 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 ##########  
     def new_service_add(self, widget, name, album, artist, treeview, liststore):
 	global services, services_order
-        service=name.get_text() #Gets the data from the textboxes
-	album_URL=album.get_text()
-	artist_URL=artist.get_text()
-
+        service=name.get_text().strip() #Gets the data from the textboxes
+	album_URL=album.get_text().strip()
+	artist_URL=artist.get_text().strip()
+	
 	if (album_URL[:7] != "http://") and (album_URL[:8] != "https://") and (album_URL != ""): album_URL="http://"+album_URL #Adds the http:// if it's not in the URL
 	if (artist_URL[:7] != "http://") and (artist_URL[:8] != "https://") and (artist_URL != ""): artist_URL="http://"+artist_URL
 	
 	if (service is not '') and not((album_URL is '') and (artist_URL is '')): #If the name is empty or both the URLs are empty, nothing is done
-        	services[service] = ('', album_URL, artist_URL , True, True) #Writes the new service in the global variables
+        	services[service] = ('', album_URL, artist_URL , album_URL is not '', artist_URL is not '') #Writes the new service in the global variables
 		services_order.append(service)
 
 	self.update_liststore(liststore)  #And updates the list
