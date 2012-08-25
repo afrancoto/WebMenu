@@ -79,13 +79,11 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 ##########
 #The "website_toggled_from_list" function is called whenever a checkbox of a website in the manager window is toggled. 
 ##########     
-    def website_toggled_from_list(self, checkbutton, path, treeview, what):
+    def website_toggled_from_list(self, checkbutton, path, model, what):
 	global services
-	(model, tree_iter) =  treeview.get_selection().get_selected()
-        service = model[path][0] #Gets the service name which is in the first column of the row with the toggled checkbox
+	service = model[path][0] #Gets the service name which is in the first column of the row with the toggled checkbox
 	
 	service_line = list(services[service]) #A tuple is read-only, so we need to convert it into a list to modify it
-
 
 	if services[service][what] is not '': 
 		service_line[what+2] = not model[path][what+2] #The setting relative to the checkbox is updated
@@ -159,15 +157,15 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 ##########  
     def new_service_add(self, widget, name, album, artist, treeview, liststore):
 	global services, services_order
-        service=name.get_text() #Gets the data from the textboxes
-	album_URL=album.get_text()
-	artist_URL=artist.get_text()
-
+        service=name.get_text().strip() #Gets the data from the textboxes
+	album_URL=album.get_text().strip()
+	artist_URL=artist.get_text().strip()
+	
 	if (album_URL[:7] != "http://") and (album_URL[:8] != "https://") and (album_URL != ""): album_URL="http://"+album_URL #Adds the http:// if it's not in the URL
 	if (artist_URL[:7] != "http://") and (artist_URL[:8] != "https://") and (artist_URL != ""): artist_URL="http://"+artist_URL
 	
 	if (service is not '') and not((album_URL is '') and (artist_URL is '')): #If the name is empty or both the URLs are empty, nothing is done
-        	services[service] = ('', album_URL, artist_URL , True, True) #Writes the new service in the global variables
+        	services[service] = ('', album_URL, artist_URL , album_URL is not '', artist_URL is not '') #Writes the new service in the global variables
 		services_order.append(service)
 
 	self.update_liststore(liststore)  #And updates the list
@@ -319,7 +317,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 	rendererAlbumCheck = Gtk.CellRendererToggle()
 	rendererAlbumCheck.set_property('activatable', True)
-	rendererAlbumCheck.connect("toggled", self.website_toggled_from_list, treeview, 1)
+	rendererAlbumCheck.connect("toggled", self.website_toggled_from_list, liststore, 1)
 	column_1 = Gtk.TreeViewColumn("Album", rendererAlbumCheck, active=3)
 	column_1.set_resizable(True)
       	column_1.set_fixed_width(75)
@@ -327,7 +325,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 	rendererArtistCheck = Gtk.CellRendererToggle()
 	rendererArtistCheck.set_property('activatable', True)
-	rendererArtistCheck.connect("toggled", self.website_toggled_from_list, treeview, 2)
+	rendererArtistCheck.connect("toggled", self.website_toggled_from_list, liststore, 2)
 	column_2 = Gtk.TreeViewColumn("Artist", rendererArtistCheck, active=4)
 	column_2.set_resizable(True)
         column_2.set_fixed_width(75)
