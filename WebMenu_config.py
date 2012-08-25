@@ -235,6 +235,28 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 		label_artist_URL.set_text('')	
 
 ##########
+#The "service_name_edited" function is called when a service name is changed. 
+########## 
+    def service_name_edited(self, cell, path, new_text, treeview, liststore):
+	global services, services_order
+	(model, tree_iter) =  treeview.get_selection().get_selected()
+        service = model.get_value(tree_iter,0) #Gets the selected one
+	
+	print "Service edited="+service
+
+	service_line=list(services[service])
+	services[new_text]=service_line #The old service line is added with the new name
+	del services[service] #The old name and line are deleted
+	
+	services_order[services_order.index(service)]=new_text #services_order is updated
+	
+	service_line=list(shortcuts[service])
+	shortcuts[new_text]=tuple(service_line) #Shortcuts are updated
+	del shortcuts[service]
+
+	self.update_liststore(liststore) #The list is updated
+
+##########
 #The "shortcut_edited" function is called whenever a shortcut is changed. 
 ########## 
     def shortcut_edited(self, cell, path, new_text, treeview, liststore, what):
@@ -287,6 +309,8 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	treeview.set_cursor(0)
 
 	rendererText = Gtk.CellRendererText()
+	rendererText.set_property('editable', True)
+	rendererText.connect('edited', self.service_name_edited, treeview, liststore)
         column_0 = Gtk.TreeViewColumn("Service", rendererText, text=0)
 	column_0.set_resizable(True)
 	column_0.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
@@ -403,10 +427,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         delete_button.connect("clicked", self.delete_service, treeview, liststore)
         hbox1.pack_start(delete_button, False, True, 0)
 
-	#shortcut_button = Gtk.Button('Edit Shortcuts')
-        #shortcut_button.connect("clicked", self.edit_shortcuts_window)
-        #hbox1.pack_start(shortcut_button, False, True, 0)
-
         reset_button = Gtk.Button('Reset to default')
         reset_button.connect("clicked", self.reset_to_default, liststore, all_album_check, all_artist_check, options_check)
         hbox1.pack_end(reset_button, False, True, 0)
@@ -417,10 +437,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	update_button = Gtk.Button("Updates? (v."+CURRENT_VERSION+")")
 	update_button.connect("clicked", self.update_search)
         hbox2.pack_start(update_button, True, True, 0)
-
-	#done_button = Gtk.Button(stock=Gtk.STOCK_APPLY)
-	#hbox2.pack_end(done_button, False, True, 0)
-	#done_button.connect_object("clicked", self.apply_settings, self)
 
 	vbox.pack_start(hbox2, False, True, 0)
 
@@ -516,7 +532,6 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
         self.new_service_window.add(vbox)
 	self.new_service_window.show_all()
 	return
-
 
 ##########
 #The "apply_settings" function is called by the "apply" button in the manager window, it's the only function that writes in dconf ("reset_to_default" excluded)  
