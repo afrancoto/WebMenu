@@ -28,7 +28,7 @@ services = {}
 services_order = []
 other_settings = []
 shortcuts = {}
-
+refresh_count=0
 web_menu_item = '''
   <ui>
     <menubar name="MenuBar">
@@ -85,6 +85,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
   def draw_menu(self, shell):
     global action_group, action_group_submenus
     global ui_id, ui_manager
+    global refresh_count
 
     menu_not_drawn=False #Usually the function is called by apply_settings, so the menu is already drawn
 
@@ -99,7 +100,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 
     #0. Web Menu
     action_group = Gtk.ActionGroup(name='WebMenuActionGroup')
-    action_group_submenus= Gtk.ActionGroup(name='WebMenuSubmenusActionGroup')
+    action_group_submenus= Gtk.ActionGroup(name='WebMenuSubmenusActionGroup_'+str(refresh_count))
+    refresh_count+=1
     web_menu_action = Gtk.Action("WebMenuAction", _("Web"), None, None)
     action_group.add_action(web_menu_action)
     #0.1 Song on Youtube
