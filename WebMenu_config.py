@@ -49,21 +49,26 @@ class WMConfig(object):
     def check_services_order(self):
 	global services_order, shortcuts
 	changed=False #The services order and shortcuts are rewritten only if one of them is changed by this function
+
+	services_order_changed=services_order
 	for service, data in services.items():
 		if service not in services_order: 
-			services_order.append(service) #If a service is missing from the "service-order" key, it is added at the end
+			services_order_changed.append(service) #If a service is missing from the "service-order" key, it is added at the end
 			changed=True
 	for service in services_order:
 		if service not in services: 
-			services_order.remove(service) #If a service is missing from the "services" key, it is also deleted from the "service-order" key
+			services_order_changed.remove(service) #If a service is missing from the "services" key, it is also deleted from the "service-order" key
 			changed=True
-	for service in shortcuts:
+
+	shortcuts_changed=shortcuts
+	for service in shortcuts: 
 		if service not in services: 
-			shortcuts.remove(service) #If a service is missing from the "services" key, it is also deleted from the "shortcuts" key
-			changed=True	
+			del shortcuts_changed[service] #If a service is missing from the "services" key, it is also deleted from the "shortcuts" key
+			changed=True
+
 	if changed: 
-		self.settings['services-order']=services_order
-		self.settings['shortcuts']=shortcuts
+		self.settings['services-order']=services_order_changed
+		self.settings['shortcuts']=shortcuts_changed
          
 class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
     __gtype_name__ = 'WebMenuConfigDialog'
@@ -235,24 +240,24 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 ##########
 #The "service_name_edited" function is called when a service name is changed. 
 ########## 
-    def service_name_edited(self, cell, path, new_text, treeview, liststore):
-	global services, services_order
-	(model, tree_iter) =  treeview.get_selection().get_selected()
-        service = model.get_value(tree_iter,0) #Gets the selected one
-	
-	print "Service edited="+service
-
-	service_line=list(services[service])
-	services[new_text]=service_line #The old service line is added with the new name
-	del services[service] #The old name and line are deleted
-	
-	services_order[services_order.index(service)]=new_text #services_order is updated
-	
-	service_line=list(shortcuts[service])
-	shortcuts[new_text]=tuple(service_line) #Shortcuts are updated
-	del shortcuts[service]
-
-	self.update_liststore(liststore) #The list is updated
+#    def service_name_edited(self, cell, path, new_text, treeview, liststore):
+#	global services, services_order
+#	(model, tree_iter) =  treeview.get_selection().get_selected()
+#        service = model.get_value(tree_iter,0) #Gets the selected one
+#	
+#	print "Service edited="+service
+#
+#	service_line=list(services[service])
+#	services[new_text]=service_line #The old service line is added with the new name
+#	del services[service] #The old name and line are deleted
+#	
+#	services_order[services_order.index(service)]=new_text #services_order is updated
+#	
+#	service_line=list(shortcuts[service])
+#	shortcuts[new_text]=tuple(service_line) #Shortcuts are updated
+#	del shortcuts[service]
+#
+#	self.update_liststore(liststore) #The list is updated
 
 ##########
 #The "shortcut_edited" function is called whenever a shortcut is changed. 
@@ -307,8 +312,8 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	treeview.set_cursor(0)
 
 	rendererText = Gtk.CellRendererText()
-	rendererText.set_property('editable', True)
-	rendererText.connect('edited', self.service_name_edited, treeview, liststore)
+	#rendererText.set_property('editable', True)
+	#rendererText.connect('edited', self.service_name_edited, treeview, liststore)
         column_0 = Gtk.TreeViewColumn("Service", rendererText, text=0)
 	column_0.set_resizable(True)
 	column_0.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
