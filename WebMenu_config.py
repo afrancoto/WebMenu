@@ -298,7 +298,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	if MANAGER_WINDOW_RUNNING: last_window_created.destroy() #This can be true only if a manager window is opened by the Preferences window when another one is already opened by manager_window_called_from_options():
 								 #the second one is destroyed (the settings are applied) and the the Peas window is opened.
 	
-	self.window = Gtk.Window()
+	self.window = Gtk.Dialog()
 	last_window_created=self.window
 
 	MANAGER_WINDOW_RUNNING=True
@@ -462,7 +462,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 		hbox.pack_end(cancel_button, False, False, 5)
 
 		vbox.pack_start(hbox, False, False, 5)
-		self.window.add(vbox)
+		self.window.get_children()[0].add(vbox)
 		self.window.show_all()
 ##########
 #The "new_service_window" function draws the window to add a new service. 
