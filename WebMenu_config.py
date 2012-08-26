@@ -60,7 +60,7 @@ class WMConfig(object):
 			services_order_changed.remove(service) #If a service is missing from the "services" key, it is also deleted from the "service-order" key
 			changed=True
 
-	shortcuts_changed=shortcuts
+	shortcuts_changed=dict(shortcuts)
 	for service in shortcuts: 
 		if service not in services: 
 			del shortcuts_changed[service] #If a service is missing from the "services" key, it is also deleted from the "shortcuts" key

@@ -297,6 +297,9 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     shell = self.object
     ui_manager = shell.props.ui_manager
     config = WMConfig()
+
+    config.check_services_order() #Checks settings integrity
+
     self.settings = config.get_settings()
     services = self.settings['services'] #'services' is a global variable with all the settings in it
     services_order = self.settings['services-order'] #'services-order' is a global variable that keeps the right order for the menu items
