@@ -281,6 +281,8 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
     else: ui_manager.get_widget("/MenuBar/WebMenu/Optionsitem").hide()
 
     ui_manager.ensure_update()
+    
+    self.song_changed('start', '', shell.props)#deactivate menus if needed
 
 ##########
 #The "do_activate" function is called when Rhythmbox is loaded
