@@ -262,10 +262,9 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 ##########
 #The "shortcut_edited" function is called whenever a shortcut is changed. 
 ########## 
-    def shortcut_edited(self, cell, path, new_text, treeview, liststore, what):
+    def shortcut_edited(self, cell, path, new_text, model, what):
 	global shortcuts
-	(model, tree_iter) =  treeview.get_selection().get_selected()
-        service = model.get_value(tree_iter,0) #Gets the selected one
+	service = model[path][0] #Gets the service name which is in the first column of the row
 
 	try: service_line=list(shortcuts[service]) #If the line in the dict doesn't exist, it's created (empty)
 	except: service_line=['','']
@@ -273,7 +272,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	service_line[what-1]=new_text #The shortcut is added
 	shortcuts[service]=tuple(service_line)
 
-	self.update_liststore(liststore) #The list is updated
+	self.update_liststore(model) #The list is updated
 
 ##########
 #The "update_liststore" function simply updated the liststore, checking if the shortcuts exist. 
@@ -338,7 +337,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 
 	rendererAlbumEditable = Gtk.CellRendererText()
 	rendererAlbumEditable.set_property('editable', True)
-	rendererAlbumEditable.connect("edited", self.shortcut_edited, treeview, liststore, 1)
+	rendererAlbumEditable.connect("edited", self.shortcut_edited, liststore, 1)
         column_3 = Gtk.TreeViewColumn("Album Shortcut", rendererAlbumEditable, text=1)
 	column_3.set_resizable(True)
 	column_3.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
@@ -347,7 +346,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 	
 	rendererArtistEditable = Gtk.CellRendererText()
 	rendererArtistEditable.set_property('editable', True)
-	rendererArtistEditable.connect("edited", self.shortcut_edited, treeview, liststore, 2)
+	rendererArtistEditable.connect("edited", self.shortcut_edited, liststore, 2)
         column_4 = Gtk.TreeViewColumn("Artist Shortcut", rendererArtistEditable, text=2)
 	column_4.set_resizable(True)
 	column_4.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
