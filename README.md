@@ -17,10 +17,10 @@ https://github.com/afrancoto/WebMenu/downloads
 SCREENSHOTS:
 ------------
 Web Menu in the menu bar:
-![Screenshot](http://s8.postimage.org/oht0wlk9x/Schermata_del_2012_08_19_17_12_10.png)
+![Screenshot](http://s18.postimage.org/3k9yu3keh/screenshot_menu.png)
 
 Web Menu in the context menu:
-![Screenshot](http://s8.postimage.org/882utp9lx/Schermata_del_2012_08_19_17_14_14.png)
+![Screenshot](http://s18.postimage.org/t1nrzycqx/screenshot_context.png)
 
 INSTALLATION: 
 ------------
@@ -31,7 +31,7 @@ INSTALLATION:
 
 CONFIGURATION:
 --------------
-![Screenshot](http://s8.postimage.org/jygsb32ed/Schermata_del_2012_08_19_17_17_08.png)
+![Screenshot](http://s18.postimage.org/6seg756o9/screenshot_options.png)
 
 To open the options you can:
 - Click the 'Options' menu item in WebMenu
