@@ -20,6 +20,7 @@ Web Menu in the menu bar:
 ![Screenshot](http://s18.postimage.org/3k9yu3keh/screenshot_menu.png)
 
 Web Menu in the context menu:
+
 ![Screenshot](http://s18.postimage.org/t1nrzycqx/screenshot_context.png)
 
 INSTALLATION: 
