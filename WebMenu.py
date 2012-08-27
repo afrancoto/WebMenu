@@ -1,5 +1,8 @@
-#WebMenu v.1.0
-#Andrea Franco 19/08/2012
+#WebMenu v.2.0
+#https://github.com/afrancoto/WebMenu
+
+#Andrea Franco 27/08/2012
+#Thanks to asermax (github.com)
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -20,9 +23,6 @@ import urllib2
 
 from WebMenu_config import WMConfig
 from WebMenu_config import WMConfigDialog
-
-#ui_id=None
-#ui_context_id=None
 
 services = {}
 services_order = []

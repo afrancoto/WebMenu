@@ -2,7 +2,8 @@
 Loader=python
 Module=WebMenu
 IAge=2
-Name=Web Menu
-Description=Search the current playing song, or a selected one, on Youtube, its album/artist on [Wikipedia, AllMusic, RateYourMusic, DiscoGS, Last.fm, Grooveshark, AllAboutJazz, Facebook, Myspace, Amazon, Torrentz], or open the artist official website with one click. (Version 1.0)
+Name=Web Menu 2.0
+Description= WebMenu is a completely personalizable Rhythmbox plugin. Search the current playing song, or a selected one, on Youtube, its album/artist on [Wikipedia, AllMusic, RateYourMusic, DiscoGS, Last.fm, Grooveshark, AllAboutJazz, Facebook, Myspace, Amazon, Torrentz], or open the artist official website with one click!
+
 Authors=Andrea Franco <a.franco.to@gmail.com>
 Copyright=Copyright © 2012 Andrea Franco
