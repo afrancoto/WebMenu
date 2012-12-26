@@ -1,30 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
   <schema id="org.gnome.rhythmbox.plugins.webmenu" path="/org/gnome/rhythmbox/plugins/webmenu/">
+	<key type="a{s(sssbb)}" name="services">
+     	 <default>{'Wikipedia':('', 'http://en.wikipedia.org/w/index.php?search=[ALBUM]', 'http://en.wikipedia.org/w/index.php?search=[ARTIST]', true, true), 
+	           'AllMusic':('', 'http://www.allmusic.com/search/album/[ALBUM]+[ARTIST]', 'http://www.allmusic.com/search/artist/[ARTIST]', false, true),
+	           'RateYourMusic':('', 'http://rateyourmusic.com/search?searchterm=[ALBUM]&amp;searchtype=l', 'http://rateyourmusic.com/search?searchterm=[ARTIST]&amp;searchtype=a', true, true),
+		   'AllAboutJazz':('','http://www.allaboutjazz.com/googlesearch.php?cx=005595936876858408448%3Ahfhqnzuknl8&amp;cof=FORID%3A11&amp;q=[ALBUM]+[ARTIST]','', true, false),
+		   'DiscoGS' :('','http://www.discogs.com/advanced_search?release_title=[ALBUM]&amp;artist=[ARTIST]','http://www.discogs.com/advanced_search?artist=[ARTIST]', false, false),
+		   'Official Website' :('','','http://www.google.com/search?btnI=I%27m+Feeling+Lucky&amp;q=[ARTIST]+official+website',false, false),
+		   'Last.fm' :('','http://www.last.fm/search?type=album&amp;q=[ALBUM]', 'http://www.last.fm/search?type=artist&amp;q=[ARTIST]', false, false),
+		   'Grooveshark' :('','http://grooveshark.com/#!/search/album?q=[ALBUM]+[ARTIST]','http://grooveshark.com/#!/search/artist?q=[ARTIST]', true, false),
+		   'Facebook' :('','https://www.facebook.com/search/results.php?type=pages&amp;q=[ALBUM]','https://www.facebook.com/search/results.php?type=pages&amp;q=[ARTIST]', false, true),
+		   'MySpace' :('','','http://www.myspace.com/search/Music?q=[ARTIST]', false, true),
+		   'Amazon.com' :('', 'http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Dpopular&amp;field-keywords=[ALBUM]+[ARTIST]','', false, false),
+		   'Torrentz' :('', 'http://torrentz.com/search?f=[ALBUM]+[ARTIST]', 'http://torrentz.com/search?f=[ARTIST]', false, true)
+	}</default>
+    	<summary>Music Services</summary>
+    	<description>Music Services - Service:(Song URL, Album URL, Artist URL, Show in Album?, Show in Artist?)</description>
+	</key>
 
-    <key type="as" name="default-album-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'allaboutjazz', 'discogs', 'lastfm', 'grooveshark', 'facebook', 'amazon', 'all']</default>
-      <summary>Album menu</summary>
-      <description>Do NOT change this.</description>
-    </key>
+	<key type="as" name="services-order">
+			<default>['Wikipedia', 'AllMusic', 'RateYourMusic', 'AllAboutJazz', 'DiscoGS', 'Official Website', 'Last.fm', 'Grooveshark', 'Facebook', 'MySpace', 'Amazon.com', 'Torrentz']</default>
+			<summary>The menus are displayed in this order</summary>
+			<description>The menus are displayed in this order</description>
+	</key>
 
-    <key type="as" name="active-album-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'facebook', 'amazon', 'all']</default>
-      <summary>Album menu</summary>
-      <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'allaboutjazz', 'discogs', 'lastfm', 'grooveshark', 'facebook', 'amazon', 'all'</description>
-    </key>
+	<key type="a{s(ss)}" name="shortcuts">
+			<default>{'Wikipedia':('&lt;Alt&gt;W', '&lt;Control&gt;W'),
+				  'AllMusic':( '&lt;Alt&gt;L', ''),
+				  'Torrentz':('', '&lt;Control&gt;T')}</default>
+			<summary>Shortcuts</summary>
+			<description>Shortcuts - Service:{Album blindig, Artist blindig}</description>
+	</key>
 
-    <key type="as" name="default-artist-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'official', 'lastfm', 'facebook', 'myspace', 'torrentz', 'all']</default>
-      <summary>Artist menu</summary>
-      <description>Do NOT change this.</description>
-    </key>
-
-    <key type="as" name="active-artist-services">
-      <default>['wikipedia', 'allmusic', 'rateyourmusic', 'facebook', 'myspace', 'torrentz', 'all']</default>
-      <summary>Artist menu</summary>
-      <description>Possible values are: 'wikipedia', 'allmusic', 'rateyourmusic', 'discogs', 'official', 'lastfm', 'facebook', 'myspace', 'torrentz', 'all'</description>
-    </key>
-
+	<key type="ab" name="other-settings">
+			<default>[true, true, true, true]</default>
+			<summary>Boolean settings for: ['Options' item, 'All' item in album menu, 'All' item in artist menu, 'Look for Lyrics' item]</summary>
+			<description>Boolean settings for: ['Options' item, 'All' item in album menu, 'All' item in artist menu, 'Look for Lyrics' item]</description>
+	</key>
   </schema>
 </schemalist>
