@@ -55,7 +55,7 @@ web_context_part = '''
 	<placeholder name="PluginPlaceholder">
 		<separator/>
           	<menuitem name="YTitem" action="search_on_youtube_action_cx"/>
-        	<menuitem name="LYitem" action="search_lyrics_action"/>
+        	<menuitem name="LYitem" action="search_lyrics_action_cx"/>
 		<menu name="AlbumMenu" action="album_menu_action">
        		 	%s
 			<separator/>
@@ -288,11 +288,11 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 	if other_settings[2]: ui_manager.get_widget(menu_option).show()
 	else: ui_manager.get_widget(menu_option).hide()
 
+    	if other_settings[3]: ui_manager.get_widget(path+"/LYitem").show()
+    	else: ui_manager.get_widget(path+"/LYitem").hide()
+
     if other_settings[0]: ui_manager.get_widget("/MenuBar/WebMenu/Optionsitem").show()
     else: ui_manager.get_widget("/MenuBar/WebMenu/Optionsitem").hide()
-
-    if other_settings[3]: ui_manager.get_widget("/MenuBar/WebMenu/LYitem").show()
-    else: ui_manager.get_widget("/MenuBar/WebMenu/LYitem").hide()
 
     ui_manager.ensure_update()
     
