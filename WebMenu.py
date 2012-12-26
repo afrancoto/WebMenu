@@ -382,7 +382,7 @@ class WebMenuPlugin(GObject.Object, Peas.Activatable):
 ##########
   def search_lyrics(self, event, shell, context=False):
     metadata=self.get_metadata(shell, context) #Calls "get_metadata"
-    final_url="https://www.google.com/webhp?q=search#hl=en&q=lyrics+\"" + urllib2.quote(metadata[0]) + "\"+\"" + urllib2.quote(metadata[2]) + "\""
+    final_url="https://www.google.com/webhp?q=search#hl=en&q=\"lyrics\"+\"" + urllib2.quote(metadata[0]) + "\"+\"" + urllib2.quote(metadata[2]) + "\""
     webbrowser.open(final_url)
 
 ##########
