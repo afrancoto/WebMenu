@@ -1,6 +1,6 @@
 from gi.repository import GObject, RB, Peas, Gtk
 import os
-import urllib2
+import urllib2 
 
 #Services data are stored in a matrix like this:
 # Line 0: SERVICE_LABEL, ALBUM_URL_WITH_KEYWORDS, ARTIST_URL_WITH_KEYWORDS
