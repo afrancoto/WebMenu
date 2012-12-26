@@ -110,7 +110,7 @@ class WMConfigDialog(GObject.Object, PeasGtk.Configurable):
 #The "update_search" function simply opens a new browser window with WebMenu downloads. 
 ##########     
     def update_search(self, widget, data=None):
-    	webbrowser.open("https://github.com/afrancoto/WebMenu/downloads")
+    	webbrowser.open("https://sites.google.com/site/webmenuplugin/download")
 
 ##########
 #The "paypal" function simply opens a new browser window with the paypal donation page. 
